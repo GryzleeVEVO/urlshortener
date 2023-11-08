@@ -21,5 +21,20 @@ class ValidatorServiceImpl : ValidatorService {
  * Implementation of the port [HashService].
  */
 class HashServiceImpl : HashService {
-    override fun hasUrl(url: String) = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
+    // VERSION DEFAULT
+    // override fun hasUrl(url: String) = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
+    
+    // MI VERSION AÑADIENDO A LA URL EL TEXTO "EJEMPLO"
+    // override fun hasUrl(url: String): String {
+    //     val baseHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
+    //     val modifiedHash = baseHash + "ejemplo"
+    //     return modifiedHash
+    // }
+
+    // MI VERSION SOLO EJEMPLO EN LA URL
+    override fun hasUrl(url: String): String {
+        //val baseHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
+        val modifiedHash = "ejemplo"
+        return modifiedHash
+    }
 }

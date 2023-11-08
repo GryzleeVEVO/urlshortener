@@ -73,13 +73,27 @@ class HttpRequestTest {
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
     }
 
+    // MI VERSION AÑADIENDO EJEMPLO AL FINAL DE LA URL
+    // @Test
+    // fun `creates returns a basic redirect if it can compute a hash`() {
+    //     val response = shortUrl("http://example.com/")
+
+    //     assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+    //     assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/f684a3c4ejemplo"))
+    //     assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/f684a3c4ejemplo"))
+
+    //     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
+    //     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
+    // }
+
+    // MI VERSION SOLO EJEMPLO EN LA URL
     @Test
     fun `creates returns a basic redirect if it can compute a hash`() {
         val response = shortUrl("http://example.com/")
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
-        assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/f684a3c4"))
-        assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/f684a3c4"))
+        assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/ejemplo"))
+        assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/ejemplo"))
 
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
