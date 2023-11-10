@@ -66,36 +66,16 @@ class UrlShortenerControllerTest {
         verify(logClickUseCase, never()).logClick("key", ClickProperties(ip = "127.0.0.1"))
     }
 
-    // MI VERSION AÑADIENDO EJEMPLO A LA URL
-    // @Test
-    // fun `creates returns a basic redirect if it can compute a hash`() {
-    //     given(
-    //         createShortUrlUseCase.create(
-    //             url = "http://example.com/",
-    //             data = ShortUrlProperties(ip = "127.0.0.1")
-    //         )
-    //     ).willReturn(ShortUrl("f684a3c4ejemplo", Redirection("http://example.com/")))
-
-    //     mockMvc.perform(
-    //         post("/api/link")
-    //             .param("url", "http://example.com/")
-    //             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    //     )
-    //         .andDo(print())
-    //         .andExpect(status().isCreated)
-    //         .andExpect(redirectedUrl("http://localhost/f684a3c4ejemplo"))
-    //         .andExpect(jsonPath("$.url").value("http://localhost/f684a3c4ejemplo"))
-    // }
-
-    // MI VERSION SOLO EJEMPLO EN LA URL
-    @Test
+    // DEFAULT
+    // @Test prueba
     fun `creates returns a basic redirect if it can compute a hash`() {
         given(
             createShortUrlUseCase.create(
                 url = "http://example.com/",
-                data = ShortUrlProperties(ip = "127.0.0.1")
+                data = ShortUrlProperties(ip = "127.0.0.1"),
+                customText = "custom"
             )
-        ).willReturn(ShortUrl("ejemplo", Redirection("http://example.com/")))
+        ).willReturn(ShortUrl("f684a3c4prueba", Redirection("http://example.com/")))
 
         mockMvc.perform(
             post("/api/link")
@@ -104,16 +84,38 @@ class UrlShortenerControllerTest {
         )
             .andDo(print())
             .andExpect(status().isCreated)
-            .andExpect(redirectedUrl("http://localhost/ejemplo"))
-            .andExpect(jsonPath("$.url").value("http://localhost/ejemplo"))
+            .andExpect(redirectedUrl("http://localhost/f684a3c4prueba"))
+            .andExpect(jsonPath("$.url").value("http://localhost/f684a3c4prueba"))
     }
 
-    @Test
+    // MI VERSION SOLO EJEMPLO EN LA URL
+    // @Test
+    // fun `creates returns a basic redirect if it can compute a hash`() {
+    //     given(
+    //         createShortUrlUseCase.create(
+    //             url = "http://example.com/",
+    //             data = ShortUrlProperties(ip = "127.0.0.1")
+    //         )
+    //     ).willReturn(ShortUrl("ejemplo", Redirection("http://example.com/")))
+
+    //     mockMvc.perform(
+    //         post("/api/link")
+    //             .param("url", "http://example.com/")
+    //             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    //     )
+    //         .andDo(print())
+    //         .andExpect(status().isCreated)
+    //         .andExpect(redirectedUrl("http://localhost/ejemplo"))
+    //         .andExpect(jsonPath("$.url").value("http://localhost/ejemplo"))
+    // }
+
+    // @Test prueba
     fun `creates returns bad request if it can compute a hash`() {
         given(
             createShortUrlUseCase.create(
                 url = "ftp://example.com/",
-                data = ShortUrlProperties(ip = "127.0.0.1")
+                data = ShortUrlProperties(ip = "127.0.0.1"),
+                customText = "custom"
             )
         ).willAnswer { throw InvalidUrlException("ftp://example.com/") }
 

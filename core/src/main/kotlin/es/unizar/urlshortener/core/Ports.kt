@@ -29,6 +29,7 @@ interface ValidatorService {
  *
  * **Note**: It is a design decision to create this port. It could be part of the core .
  */
+ //, prueba: String
 interface HashService {
-    fun hasUrl(url: String): String
+    fun hasUrl(url: String): String  
 }

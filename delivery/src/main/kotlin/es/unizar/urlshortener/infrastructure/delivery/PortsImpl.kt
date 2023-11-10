@@ -24,6 +24,13 @@ class HashServiceImpl : HashService {
     // VERSION DEFAULT
     // override fun hasUrl(url: String) = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
     
+    //PRUEBA
+    override fun hasUrl(url: String): String { //, prueba: String
+        // val baseHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
+        val modifiedHash = url //+ prueba //baseHash + prueba
+        return modifiedHash
+    }
+
     // MI VERSION AÑADIENDO A LA URL EL TEXTO "EJEMPLO"
     // override fun hasUrl(url: String): String {
     //     val baseHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
@@ -32,9 +39,9 @@ class HashServiceImpl : HashService {
     // }
 
     // MI VERSION SOLO EJEMPLO EN LA URL
-    override fun hasUrl(url: String): String {
+    // override fun hasUrl(url: String): String {
         //val baseHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
-        val modifiedHash = "ejemplo"
-        return modifiedHash
-    }
+    //     val modifiedHash = "ejemplo"
+    //     return modifiedHash
+    // }
 }

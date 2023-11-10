@@ -11,7 +11,7 @@ import es.unizar.urlshortener.core.*
  * **Note**: This is an example of functionality.
  */
 interface CreateShortUrlUseCase {
-    fun create(url: String, data: ShortUrlProperties): ShortUrl
+    fun create(url: String, data: ShortUrlProperties, customText: String): ShortUrl
 }
 
 /**
@@ -22,9 +22,9 @@ class CreateShortUrlUseCaseImpl(
     private val validatorService: ValidatorService,
     private val hashService: HashService
 ) : CreateShortUrlUseCase {
-    override fun create(url: String, data: ShortUrlProperties): ShortUrl =
+    override fun create(url: String, data: ShortUrlProperties, customText: String): ShortUrl =
         if (validatorService.isValid(url)) {
-            val id: String = hashService.hasUrl(url)
+            val id: String = hashService.hasUrl(customText) //url,"prueba"
             val su = ShortUrl(
                 hash = id,
                 redirection = Redirection(target = url),
