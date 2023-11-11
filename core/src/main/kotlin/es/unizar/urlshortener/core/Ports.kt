@@ -31,5 +31,5 @@ interface ValidatorService {
  */
  //, prueba: String
 interface HashService {
-    fun hasUrl(url: String): String  
+    fun hasUrl(url: String, customText: String): String  
 }

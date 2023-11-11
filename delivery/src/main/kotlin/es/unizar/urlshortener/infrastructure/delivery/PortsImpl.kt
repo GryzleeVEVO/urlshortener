@@ -25,10 +25,15 @@ class HashServiceImpl : HashService {
     // override fun hasUrl(url: String) = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
     
     //PRUEBA
-    override fun hasUrl(url: String): String { //, prueba: String
+    override fun hasUrl(url: String, customText: String): String { //, prueba: String
         // val baseHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
-        val modifiedHash = url //+ prueba //baseHash + prueba
-        return modifiedHash
+        if (customText == ""){
+            val modifiedHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
+            return modifiedHash
+        }else{
+            val modifiedHash = customText
+            return modifiedHash
+        }
     }
 
     // MI VERSION AÑADIENDO A LA URL EL TEXTO "EJEMPLO"
