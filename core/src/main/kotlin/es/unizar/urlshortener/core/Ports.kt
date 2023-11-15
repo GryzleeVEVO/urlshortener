@@ -32,3 +32,7 @@ interface ValidatorService {
 interface HashService {
     fun hasUrl(url: String): String
 }
+
+interface QrCodeService {
+    fun generateQrCode(url: String): ByteArray
+}

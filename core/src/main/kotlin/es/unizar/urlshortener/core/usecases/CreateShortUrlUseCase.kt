@@ -33,6 +33,7 @@ class CreateShortUrlUseCaseImpl(
                     ip = data.ip,
                     sponsor = data.sponsor
                 )
+
             )
             shortUrlRepository.save(su)
         } else {

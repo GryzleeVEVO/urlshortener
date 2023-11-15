@@ -4,6 +4,7 @@ import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
+import es.unizar.urlshortener.core.usecases.QrUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
@@ -35,6 +36,10 @@ interface UrlShortenerController {
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
+
+
+
+    fun getQrCode(id: String): ResponseEntity<ByteArray>
 }
 
 /**
@@ -62,7 +67,8 @@ data class ShortUrlDataOut(
 class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
-    val createShortUrlUseCase: CreateShortUrlUseCase
+    val createShortUrlUseCase: CreateShortUrlUseCase,
+    val qrUseCase: QrUseCase
 ) : UrlShortenerController {
 
     @GetMapping("/{id:(?!api|index).*}")
@@ -94,4 +100,12 @@ class UrlShortenerControllerImpl(
             )
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
+
+    @GetMapping("/{id}/qr")
+    override fun getQrCode(@PathVariable id: String): ResponseEntity<ByteArray> {
+        val qrCode = qrUseCase.generateQrCode(id)
+        val h = HttpHeaders()
+        h.contentType = MediaType.IMAGE_PNG
+        return ResponseEntity(qrCode, h, HttpStatus.OK)
+    }
 }
