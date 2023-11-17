@@ -15,6 +15,10 @@ kotlin {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    // con esto consigo que me imprimar por pantalla lo que quiera para debug
+    addTestOutputListener { _, outputEvent ->
+        logger.lifecycle(outputEvent.message)
+    }
 }
 
 tasks.named<Detekt>("detekt") {

@@ -39,8 +39,8 @@ class CreateShortUrlUseCaseImpl(
                     throw UnsafeUrlException(url) //cambiar por otra nueva de Unsafe
                 }
             }
-            return@let it
-            // throw InvalidUrlException(url)
+            // return@let it
+            throw InvalidUrlException(url)
         } ?: run {
             if (validatorService.isValid(url)) {
                 // val id: String = hashService.hasUrl(url,customText)
