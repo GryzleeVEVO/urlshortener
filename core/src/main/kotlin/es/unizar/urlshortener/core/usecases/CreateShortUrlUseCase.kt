@@ -40,7 +40,7 @@ class CreateShortUrlUseCaseImpl(
                 }
             }
             // return@let it
-            throw InvalidUrlException(url)
+            throw UsedCustomWordException(url)
         } ?: run {
             if (validatorService.isValid(url)) {
                 // val id: String = hashService.hasUrl(url,customText)
