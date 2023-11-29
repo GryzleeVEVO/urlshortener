@@ -6,4 +6,4 @@ class RedirectionNotFound(key: String) : Exception("[$key] is not known")
 
 class UnsafeUrlException(url: String) : Exception("[$url] is not safe")
 
-class UsedCustomWordException(url: String) : Exception("the custom word is already in use")
+class UsedCustomWordException(customText: String) : Exception("the custom word [$customText] is already in use")

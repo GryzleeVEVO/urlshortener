@@ -24,15 +24,16 @@ class HashServiceImpl : HashService {
     // VERSION DEFAULT
     // override fun hasUrl(url: String) = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
     
-    //PRUEBA
+    //VERSION BUENA
     override fun hasUrl(url: String, customText: String): String { //, prueba: String
         // val baseHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
-        if (customText == ""){
+        // val regex = Regex("[a-zA-Z0-9]+")
+        if (customText == ""){ //|| !customText.matches(regex)
             val modifiedHash = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
             return modifiedHash
         }else{
             val modifiedHash = customText
-            return modifiedHash
+            return modifiedHash           
         }
     }
 
