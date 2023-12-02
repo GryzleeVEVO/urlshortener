@@ -1,5 +1,7 @@
 package es.unizar.urlshortener.core
 
+import java.io.File
+
 /**
  * [ClickRepositoryService] is the port to the repository that provides persistence to [Clicks][Click].
  */
@@ -32,4 +34,13 @@ interface ValidatorService {
  //, prueba: String
 interface HashService {
     fun hasUrl(url: String, customText: String): String  
+}
+
+
+/**
+ * [CsvService] is the port to the service that creates a list of hash from a Csv with URLs file.
+ *
+ */
+interface CsvService {
+    fun csvHasUrl(csvFile: File, customText: String): List<String>  
 }

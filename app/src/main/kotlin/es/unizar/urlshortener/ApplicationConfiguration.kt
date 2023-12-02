@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
+import es.unizar.urlshortener.infrastructure.delivery.CsvServiceImpl
+
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
  *
@@ -34,6 +36,9 @@ class ApplicationConfiguration(
 
     @Bean
     fun hashService() = HashServiceImpl()
+
+    @Bean
+    fun csvService() = CsvServiceImpl()
 
     @Bean
     fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
