@@ -1,6 +1,6 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
-import es.unizar.urlshortener.core.usecases.CsvUserCase
+import es.unizar.urlshortener.core.usecases.CsvUseCase
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -30,7 +30,7 @@ interface CsvController {
  */
 @RestController
 class CsvControllerImpl(
-    private val csvUserCase: CsvUserCase
+    private val csvUseCase: CsvUseCase
 ) : CsvController {
     @PostMapping("/api/bulk", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     override fun generateCsv(
@@ -41,7 +41,7 @@ class CsvControllerImpl(
         val csvContent = readUrlsFromCsv(csvFile)
 
         // Llamar al caso de uso para generar el CSV
-        val csvContentResult = csvUserCase.createCsv(csvContent, "") //customText
+        val csvContentResult = csvUseCase.createCsv(csvContent, "") //customText
 
         // Configurar la respuesta HTTP
         val headers = HttpHeaders()

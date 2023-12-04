@@ -17,13 +17,13 @@ import java.io.StringWriter
  * fila de la primera columna es una URL se devuelve un string con las URL acortadas
  * Cuando se crean, se pueden agregar datos opcionales (data)
  */
-interface CsvUserCase {
+interface CsvUseCase {
     fun createCsv(csvContent: List<String>, customText: String): String
 }
 
-class CsvUserCaseImpl(
+class CsvUseCaseImpl(
     private val csvService: CsvService
-) : CsvUserCase {
+) : CsvUseCase {
     override fun createCsv(csvContent: List<String>, customText: String): String {
         // Obtener una lista<string> con las URL originales
         val originalUrls = mutableListOf<String>()
