@@ -18,33 +18,23 @@ import java.io.StringWriter
  * Cuando se crean, se pueden agregar datos opcionales (data)
  */
 interface CsvUserCase {
-    fun createCsv(csvFile: File, customText: String): String
+    fun createCsv(csvContent: List<String>, customText: String): String
 }
 
 class CsvUserCaseImpl(
     private val csvService: CsvService
 ) : CsvUserCase {
-    override fun createCsv(csvFile: File, customText: String): String {
-        // Obtener una lista<string> con las url originales
+    override fun createCsv(csvContent: List<String>, customText: String): String {
+        // Obtener una lista<string> con las URL originales
         val originalUrls = mutableListOf<String>()
-        CSVReader(FileReader(csvFile)).use { csvReader ->
-            var nextRecord: Array<String>?
-
-            // Leer cada línea del CSV
-            while (csvReader.readNext().also { nextRecord = it } != null) {
-                // Cogemos el valor de la columna 0
-                val url = nextRecord?.get(0)
-                if (url != null) {
-                    // Agregar el resultado a la lista de URLs procesadas
-                    originalUrls.add(url)
-                }
-            }
+        csvContent.forEach { url ->
+            // Agregar el resultado a la lista de URLs procesadas
+            originalUrls.add(url)
         }
 
-        // Obtener una lista<string> con las url recortadas
-        val processedUrls = csvService.csvHasUrl(csvFile, customText)
+        // Obtener una lista<string> con las URL recortadas
+        val processedUrls = csvService.csvHasUrl(csvContent, customText)
 
-        
         val stringWriter = StringWriter()
         CSVWriter(stringWriter).use { csvWriter ->
             originalUrls.zip(processedUrls).forEach { (originalUrl, processedUrl) ->
@@ -55,3 +45,4 @@ class CsvUserCaseImpl(
         return stringWriter.toString()
     }
 }
+

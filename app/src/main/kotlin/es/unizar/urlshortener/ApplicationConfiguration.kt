@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 import es.unizar.urlshortener.infrastructure.delivery.CsvServiceImpl
+import es.unizar.urlshortener.core.usecases.CsvUserCaseImpl
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
@@ -49,4 +50,8 @@ class ApplicationConfiguration(
     @Bean
     fun createShortUrlUseCase() =
         CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
+
+    @Bean
+    fun csvUserCase() =
+        CsvUserCaseImpl(csvService())
 }

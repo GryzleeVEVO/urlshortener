@@ -57,34 +57,29 @@ class HashServiceImpl : HashService {
     // }
 }
 
-class CsvServiceImpl: CsvService {
-    override fun csvHasUrl(csvFile: File, customText: String): List<String>{
-
+class CsvServiceImpl : CsvService {
+    override fun csvHasUrl(csvFile: List<String>, customText: String): List<String> {
         // Lista dinámica para almacenar el resultado
         val processedUrls = mutableListOf<String>()
 
-        // Utilizar CSVReader de OpenCSV para leer el archivo CSV
-        CSVReader(FileReader(csvFile)).use { csvReader ->
-            var nextRecord: Array<String>?
+        // Iterar sobre cada URL en la lista
+        for (url in csvFile) {
+            // Instancia de hasServiceImp
+            val hashServiceInstance = HashServiceImpl()
 
-            // Leer cada línea del CSV
-            while (csvReader.readNext().also { nextRecord = it } != null) {
-                // Cogemos el valor de la columna 0
-                val url = nextRecord?.get(0)
-                if (url != null) {
-                    // Instancia de hasServiceImp
-                    val hashServiceInstance = HashServiceImpl()
-                    // Procesar la URL con la funcion hasUrl 
-                    //(por ahora no se tiene en cuenta el custom, habria que tener una lista de string)
-                    val result = hashServiceInstance.hasUrl(url, "") //customText
-                    
-                    // Agregar el resultado a la lista de URLs procesadas
-                    processedUrls.add(result)
-                }
-            }
+            // Procesar la URL con la función hasUrl
+            // (por ahora no se tiene en cuenta el custom, habría que tener una lista de string)
+            val result = hashServiceInstance.hasUrl(url, "") //customText
+
+            // Agregar el resultado a la lista de URLs procesadas
+            processedUrls.add(result)
         }
 
         // Devolver la lista de URLs procesadas
         return processedUrls
     }
 }
+
+
+
+

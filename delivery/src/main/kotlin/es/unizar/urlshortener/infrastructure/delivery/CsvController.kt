@@ -18,9 +18,10 @@ interface CsvController {
     /**
      * Genera y devuelve un csv en funcion del csv de entrada y del texto personalizado(aun no)
      */
+    //@RequestPart("customText") customText: String = ""
     fun generateCsv(
     @RequestPart("csvFile") csvFile: MultipartFile,
-    @RequestPart("customText") customText: String = ""
+    @RequestPart("customText") customText: String?
 ): ResponseEntity<String>
 }
 
@@ -31,17 +32,16 @@ interface CsvController {
 class CsvControllerImpl(
     private val csvUserCase: CsvUserCase
 ) : CsvController {
-
     @PostMapping("/api/bulk", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     override fun generateCsv(
-        @RequestPart("csvFile") csvFile: MultipartFile,
-        @RequestPart("customText") customText: String
+        @RequestPart("file") csvFile: MultipartFile,
+        @RequestPart("customText") customText: String?
     ): ResponseEntity<String> {
-        // Convertir MultipartFile a File
-        val convertedCsvFile = convertMultipartFileToFile(csvFile)
+        // Convertir MultipartFile a lista de strings
+        val csvContent = readUrlsFromCsv(csvFile)
 
         // Llamar al caso de uso para generar el CSV
-        val csvContent = csvUserCase.createCsv(convertedCsvFile, customText)
+        val csvContentResult = csvUserCase.createCsv(csvContent, "") //customText
 
         // Configurar la respuesta HTTP
         val headers = HttpHeaders()
@@ -49,13 +49,11 @@ class CsvControllerImpl(
         headers.setContentDispositionFormData("attachment", "output.csv")
 
         // Devolver la respuesta HTTP con el contenido del CSV
-        return ResponseEntity(csvContent, headers, HttpStatus.OK)
+        return ResponseEntity(csvContentResult, headers, HttpStatus.OK)
     }
 
-    // Metodo para convertir MultipartFile a File
-    private fun convertMultipartFileToFile(multipartFile: MultipartFile): File {
-        val file = File(multipartFile.originalFilename!!)
-        multipartFile.transferTo(file)
-        return file
+    // Método para convertir MultipartFile a lista de strings
+    private fun readUrlsFromCsv(csvFile: MultipartFile): List<String> {
+        return csvFile.inputStream.bufferedReader().readLines()
     }
 }

@@ -42,5 +42,5 @@ interface HashService {
  *
  */
 interface CsvService {
-    fun csvHasUrl(csvFile: File, customText: String): List<String>  
+    fun csvHasUrl(csvFile: List<String>, customText: String): List<String>  
 }
