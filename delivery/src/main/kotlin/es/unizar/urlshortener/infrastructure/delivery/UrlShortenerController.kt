@@ -4,6 +4,7 @@ import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
+import es.unizar.urlshortener.core.usecases.ParseHeaderUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
@@ -41,16 +42,14 @@ interface UrlShortenerController {
  * Data required to create a short url.
  */
 data class ShortUrlDataIn(
-    val url: String,
-    val sponsor: String? = null
+    val url: String, val sponsor: String? = null
 )
 
 /**
  * Data returned after the creation of a short url.
  */
 data class ShortUrlDataOut(
-    val url: URI? = null,
-    val properties: Map<String, Any> = emptyMap()
+    val url: URI? = null, val properties: Map<String, Any> = emptyMap()
 )
 
 /**
@@ -62,13 +61,19 @@ data class ShortUrlDataOut(
 class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
-    val createShortUrlUseCase: CreateShortUrlUseCase
+    val createShortUrlUseCase: CreateShortUrlUseCase,
+    val parseHeaderUseCase: ParseHeaderUseCase
 ) : UrlShortenerController {
 
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
         redirectUseCase.redirectTo(id).let {
-            logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
+            val data = parseHeaderUseCase.parseHeader(
+                request.getHeader("User-Agent"),
+                ClickProperties(ip = request.remoteAddr)
+            )
+
+            logClickUseCase.logClick(id, data)
             val h = HttpHeaders()
             h.location = URI.create(it.target)
             ResponseEntity<Unit>(h, HttpStatus.valueOf(it.mode))
@@ -77,18 +82,15 @@ class UrlShortenerControllerImpl(
     @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
-            url = data.url,
-            data = ShortUrlProperties(
-                ip = request.remoteAddr,
-                sponsor = data.sponsor
+            url = data.url, data = ShortUrlProperties(
+                ip = request.remoteAddr, sponsor = data.sponsor
             )
         ).let {
             val h = HttpHeaders()
             val url = linkTo<UrlShortenerControllerImpl> { redirectTo(it.hash, request) }.toUri()
             h.location = url
             val response = ShortUrlDataOut(
-                url = url,
-                properties = mapOf(
+                url = url, properties = mapOf(
                     "safe" to it.properties.safe
                 )
             )

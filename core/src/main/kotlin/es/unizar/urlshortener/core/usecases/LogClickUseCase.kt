@@ -9,7 +9,7 @@ import es.unizar.urlshortener.core.ClickRepositoryService
  *
  * **Note**: This is an example of functionality.
  */
-interface LogClickUseCase {
+    interface LogClickUseCase {
     fun logClick(key: String, data: ClickProperties)
 }
 
@@ -22,9 +22,7 @@ class LogClickUseCaseImpl(
     override fun logClick(key: String, data: ClickProperties) {
         val cl = Click(
             hash = key,
-            properties = ClickProperties(
-                ip = data.ip
-            )
+            properties = data
         )
         clickRepository.save(cl)
     }
