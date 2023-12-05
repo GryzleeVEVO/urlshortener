@@ -132,17 +132,3 @@ class UrlShortenerControllerImpl(
         return ResponseEntity(HttpStatus.NOT_FOUND)
     }
 }
-
-
-
-/*
-    @GetMapping("/{id}/qr")
-    override fun getQrCode(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> {
-        val url = linkTo<UrlShortenerControllerImpl> { redirectTo(id, request) }.toUri().toString()
-        val qrCode = qrCodeUseCase.canGenerateQrCode(url)
-        if(qrCode==true) {qrUrl=qrCodeUseCase.createQrCode(url)}
-        val h = HttpHeaders()
-        h.contentType = MediaType.IMAGE_PNG
-        return ResponseEntity(qrUrl, h, HttpStatus.OK)
-    }
-*/

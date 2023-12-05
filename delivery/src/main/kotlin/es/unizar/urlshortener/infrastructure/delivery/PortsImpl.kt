@@ -31,10 +31,16 @@ class HashServiceImpl : HashService {
     override fun hasUrl(url: String) = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
 }
 
+
 class QrCodeServiceImpl : QrCodeService {
+
+    companion object {
+        const val QR_CODE_WIDTH = 300
+        const val QR_CODE_HEIGHT = 300
+    }
     override fun generateQrCode(url: String): String {
         val writer = QRCodeWriter()
-        val bitMatrix: BitMatrix = writer.encode(url, BarcodeFormat.QR_CODE, 300, 300)
+        val bitMatrix: BitMatrix = writer.encode(url, BarcodeFormat.QR_CODE, QR_CODE_WIDTH, QR_CODE_HEIGHT)
 
         val stream = ByteArrayOutputStream()
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", stream)
@@ -44,16 +50,4 @@ class QrCodeServiceImpl : QrCodeService {
 
         return base64Image
     }
-/*
-    override fun generateQrCode(url: String): String {
-        val writer = QRCodeWriter()
-        val bitMatrix: BitMatrix = writer.encode(url, BarcodeFormat.QR_CODE, 300, 300)
-
-        val stream = ByteArrayOutputStream()
-        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", stream)
-
-        return stream.toByteArray()
-    }
-
- */
 }

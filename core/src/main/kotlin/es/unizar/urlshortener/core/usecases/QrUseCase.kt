@@ -1,3 +1,4 @@
+@file:Suppress("WildcardImport")
 package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.*
@@ -10,7 +11,7 @@ import es.unizar.urlshortener.core.QrCodeService
 // Si falla lanzar excecpiones (400 / 404) Not found se lanzaria aqui dentro
 interface QrUseCase {
     fun canGenerateQrCode(id: String): Boolean
-    fun createQrCode(id: String): String
+    fun createQrCode(redirectUrl: String): String
 }
 
 class QrCodeUseCaseImpl
@@ -33,15 +34,3 @@ class QrCodeUseCaseImpl
     }
 
 }
-/*
-class QrCodeUseCaseImpl
-    (private val qrCodeService: QrCodeService,
-     private val shortUrlRepository: ShortUrlRepositoryService
-            )
-    : QrUseCase {
-    override fun generateQrCode(id: String): Boolean {
-        val shortUrl = shortUrlRepository.findByKey(id).toString()
-        return qrCodeService.generateQrCode()
-    }
-}
- */
