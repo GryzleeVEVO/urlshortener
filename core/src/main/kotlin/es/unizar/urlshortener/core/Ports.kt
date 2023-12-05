@@ -34,5 +34,5 @@ interface HashService {
 }
 
 interface QrCodeService {
-    fun generateQrCode(url: String): ByteArray
+    fun generateQrCode(url: String): String
 }

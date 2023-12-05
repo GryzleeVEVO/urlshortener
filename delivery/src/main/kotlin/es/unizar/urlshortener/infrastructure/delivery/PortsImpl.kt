@@ -11,6 +11,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import java.io.ByteArrayOutputStream
+import java.util.Base64
 
 /**
  * Implementation of the port [ValidatorService].
@@ -31,7 +32,20 @@ class HashServiceImpl : HashService {
 }
 
 class QrCodeServiceImpl : QrCodeService {
-    override fun generateQrCode(url: String): ByteArray {
+    override fun generateQrCode(url: String): String {
+        val writer = QRCodeWriter()
+        val bitMatrix: BitMatrix = writer.encode(url, BarcodeFormat.QR_CODE, 300, 300)
+
+        val stream = ByteArrayOutputStream()
+        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", stream)
+
+        val qrCodeBytes = stream.toByteArray()
+        val base64Image = Base64.getEncoder().encodeToString(qrCodeBytes)
+
+        return base64Image
+    }
+/*
+    override fun generateQrCode(url: String): String {
         val writer = QRCodeWriter()
         val bitMatrix: BitMatrix = writer.encode(url, BarcodeFormat.QR_CODE, 300, 300)
 
@@ -40,4 +54,6 @@ class QrCodeServiceImpl : QrCodeService {
 
         return stream.toByteArray()
     }
+
+ */
 }
