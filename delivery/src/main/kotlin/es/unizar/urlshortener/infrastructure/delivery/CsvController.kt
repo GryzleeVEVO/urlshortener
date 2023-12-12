@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
+import jakarta.servlet.http.HttpServletRequest
 
 
 interface CsvController {
@@ -19,15 +20,21 @@ interface CsvController {
      * Genera y devuelve un csv en funcion del csv de entrada y del texto personalizado(aun no)
      */
     //@RequestPart("customText") customText: String = ""
+
+    //request: HttpServletRequest
     fun generateCsv(
     @RequestPart("csvFile") csvFile: MultipartFile,
-    @RequestPart("customText") customText: String?
+    @RequestPart("customText") customText: String?,
+    request: HttpServletRequest
+    
 ): ResponseEntity<String>
 }
 
 /**
  * Implementacion del controlador csv
  */
+
+ //request: HttpServletRequest
 @RestController
 class CsvControllerImpl(
     private val csvUseCase: CsvUseCase
@@ -35,13 +42,19 @@ class CsvControllerImpl(
     @PostMapping("/api/bulk", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     override fun generateCsv(
         @RequestPart("file") csvFile: MultipartFile,
-        @RequestPart("customText") customText: String?
+        @RequestPart("customText") customText: String?,
+        request: HttpServletRequest
+        
     ): ResponseEntity<String> {
+        val ip = request.remoteAddr
+        println("Direccion IP del cliente: $ip")
+
         // Convertir MultipartFile a lista de strings
         val csvContent = readUrlsFromCsv(csvFile)
+        println("Primera componente del csv: ${csvContent[0]}")
 
         // Llamar al caso de uso para generar el CSV
-        val csvContentResult = csvUseCase.createCsv(csvContent, "") //customText
+        val csvContentResult = csvUseCase.createCsv(csvContent, "", ip) //customText
 
         // Configurar la respuesta HTTP
         val headers = HttpHeaders()
@@ -49,7 +62,8 @@ class CsvControllerImpl(
         headers.setContentDispositionFormData("attachment", "output.csv")
 
         // Devolver la respuesta HTTP con el contenido del CSV
-        return ResponseEntity(csvContentResult, headers, HttpStatus.OK)
+        return ResponseEntity(csvContentResult, headers, HttpStatus.OK) 
+        //TIENE QUE SER 201 NO 200 PERO SI EL FICHER ESTA VACIO DEVUELVE 200
     }
 
     // Método para convertir MultipartFile a lista de strings

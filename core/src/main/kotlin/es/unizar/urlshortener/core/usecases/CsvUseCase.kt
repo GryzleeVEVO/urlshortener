@@ -18,13 +18,14 @@ import java.io.StringWriter
  * Cuando se crean, se pueden agregar datos opcionales (data)
  */
 interface CsvUseCase {
-    fun createCsv(csvContent: List<String>, customText: String): String
+    fun createCsv(csvContent: List<String>, customText: String, ipParam: String): String
 }
 
 class CsvUseCaseImpl(
+    private val shortUrlRepository: ShortUrlRepositoryService,
     private val csvService: CsvService
 ) : CsvUseCase {
-    override fun createCsv(csvContent: List<String>, customText: String): String {
+    override fun createCsv(csvContent: List<String>, customText: String, ipParam: String): String {
         // Obtener una lista<string> con las URL originales
         val originalUrls = mutableListOf<String>()
         csvContent.forEach { url ->
@@ -34,6 +35,29 @@ class CsvUseCaseImpl(
 
         // Obtener una lista<string> con las URL recortadas
         val processedUrls = csvService.csvHasUrl(csvContent, customText)
+        
+        // ASI NO DEPENDO DE csvHashUrl        
+        // Lista dinámica para almacenar el resultado
+        // val processedUrls = mutableListOf<String>()
+        // for (url in csvContent) {
+        //     val processedUrl = hashService.hasUrl(url, "")
+        //     processedUrls.add(processedUrl)
+        // }
+
+        // Guardar en la BD
+        for (i in csvContent.indices) {
+            println("Redireccion a: ${csvContent[i]}")
+            println("Hash: ${processedUrls[i]}")
+            println("Direccion IP del cliente: $ipParam")
+            val su = ShortUrl(
+                hash = processedUrls[i],
+                redirection = Redirection(target = csvContent[i]),
+                properties = ShortUrlProperties(
+                    ip = ipParam,
+                )
+            )  
+            shortUrlRepository.save(su)
+        }
 
         val stringWriter = StringWriter()
         CSVWriter(stringWriter).use { csvWriter ->

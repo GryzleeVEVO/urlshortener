@@ -33,7 +33,7 @@ $(document).ready(
                 data: formData,
                 contentType: false,
                 processData: false,
-                success: function (data) {
+                success: function (data, request) { //, request
                     // La variable "data" contiene la respuesta del servidor.
                     // Manejar la respuesta del servidor con el contenido del CSV procesado
                     var resultHtml = "<div class='alert alert-success lead'>CSV procesado:<br>";
