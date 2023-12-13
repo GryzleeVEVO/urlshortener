@@ -12,6 +12,7 @@ import java.io.FileWriter
 import java.io.StringWriter
 
 
+
 /*
  * Dada una lista de customText (POR AHORA ESO NO) y un fichero csv en el que cada 
  * fila de la primera columna es una URL se devuelve un string con las URL acortadas
@@ -58,7 +59,8 @@ class CsvUseCaseImpl(
             )  
             shortUrlRepository.save(su)
         }
-
+        
+        // se ponen comillas en el hash
         val stringWriter = StringWriter()
         CSVWriter(stringWriter).use { csvWriter ->
             originalUrls.zip(processedUrls).forEach { (originalUrl, processedUrl) ->

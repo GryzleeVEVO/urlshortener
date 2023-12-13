@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.hateoas.server.mvc.linkTo
 
 
 interface CsvController {
@@ -56,14 +57,55 @@ class CsvControllerImpl(
         // Llamar al caso de uso para generar el CSV
         val csvContentResult = csvUseCase.createCsv(csvContent, "", ip) //customText
 
+        // eliminar las comillas innecesarias
+        var cadenaResultado = ""
+        for (i in csvContentResult.indices){
+            if (csvContentResult[i].toString() != "\""){
+                cadenaResultado+=csvContentResult[i]
+            }
+        }
+        // println("csvContentResult:")
+        // for (item in csvContentResult) {
+        //     println(item)
+        // }
+        // println("cadenaResultado:")
+        // for (item in cadenaResultado) {
+        //     println(item)
+        // }
+        
+        //ESTE ES EL BUENO
+        val csvContentWithFullUrls = cadenaResultado.lines().map { line ->
+            val splitLine = line.split(",")
+            if (splitLine.size >= 2) {
+                val (originalUrl, processedUrl) = splitLine
+                val fullUrl = linkTo<UrlShortenerControllerImpl> { redirectTo(processedUrl, request) }.toUri()
+                "$originalUrl,$fullUrl"
+            } else {
+                // Handle the case where the line does not contain the expected format
+                // You can log a warning or handle it based on your requirements
+                "Invalid line format: $line"
+            }
+        }.joinToString("\n")
+        
+
         // Configurar la respuesta HTTP
         val headers = HttpHeaders()
         headers.contentType = MediaType.parseMediaType("text/csv")
         headers.setContentDispositionFormData("attachment", "output.csv")
 
+            // Devolver la respuesta HTTP con el contenido del CSV
+        return ResponseEntity(csvContentWithFullUrls, headers, HttpStatus.CREATED)
+
+         
+
+
+        // Configurar la respuesta HTTP
+        ///val headers = HttpHeaders()
+        //headers.contentType = MediaType.parseMediaType("text/csv")
+        //headers.setContentDispositionFormData("attachment", "output.csv")
+
         // Devolver la respuesta HTTP con el contenido del CSV
-        return ResponseEntity(csvContentResult, headers, HttpStatus.OK) 
-        //TIENE QUE SER 201 NO 200 PERO SI EL FICHER ESTA VACIO DEVUELVE 200
+        //return ResponseEntity(csvContentResult, headers, HttpStatus.CREATED) //HTTP: 201  
     }
 
     // Método para convertir MultipartFile a lista de strings
