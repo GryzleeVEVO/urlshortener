@@ -77,8 +77,8 @@ class CsvControllerImpl(
         //     println(item)
         // }
         
-        //ESTE ES EL BUENO, poner la ip a los hash
-        val csvContentWithFullUrls = cadenaResultado.lines().map { line ->
+        //ESTE ES EL BUENO (no quita los hash ya usados), poner la ip a los hash
+       /*val csvContentWithFullUrls = cadenaResultado.lines().map { line ->
             val splitLine = line.split(",")
             if (splitLine.size >= 2) {
                 val (originalUrl, processedUrl) = splitLine
@@ -86,10 +86,30 @@ class CsvControllerImpl(
                 "$originalUrl,$fullUrl"
             } else {
                 // Handle the case where the line does not contain the expected format
-                // You can log a warning or handle it based on your requirements
                 "Invalid line format: $line"
             }
         }.joinToString("\n")
+        */
+
+        // ESTE ES EL BUENO (quita los hash que ya se han usado)
+        val csvContentWithFullUrls = cadenaResultado.lines().map { line ->
+            val splitLine = line.split(",")
+            if (splitLine.size >= 2) {
+                val (originalUrl, processedUrl, alreadyUsedWords) = splitLine
+
+                val fullUrl = if (alreadyUsedWords.toBoolean()) {
+                    ""
+                } else {
+                    linkTo<UrlShortenerControllerImpl> { redirectTo(processedUrl, request) }.toUri()
+                }
+
+                "$originalUrl,$fullUrl"
+            } else {
+                // Handle the case where the line does not contain the expected format
+                "Invalid line format: $line"
+            }
+        }.joinToString("\n")
+
 
         //coger la primera url acortada para la cabecera location
         val lines = csvContentWithFullUrls.trim().split("\n")

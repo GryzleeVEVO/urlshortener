@@ -48,6 +48,8 @@ class CsvUseCaseImpl(
         //     processedUrls.add(processedUrl)
         // }
 
+        // lista que indica si ya se ha usado esa palabra para comunacarlo al CsvController
+        val alreadyUsedWords = mutableListOf<Boolean>()
         // Guardar en la BD
         for (i in csvContent.indices) {
             println("Redireccion a: ${csvContent[i]}")
@@ -56,7 +58,7 @@ class CsvUseCaseImpl(
             shortUrlRepository.findByKey(processedUrls[i])?.let{
                 println("YA ESTA EN LA BDDDDDDDDDDD")
                 //sustituir la url recortada por vacio
-                //processedUrls[i] = ""
+                alreadyUsedWords.add(true)
             }?: run {
             // else{
                 println("NO ESTA EN LA BDDDDDDDDDDD")
@@ -68,15 +70,24 @@ class CsvUseCaseImpl(
                     )
                 )  
                 shortUrlRepository.save(su)
+                alreadyUsedWords.add(false)
             }
         }
 
-        // se ponen comillas en el hash
+        println("alreadyUsedWords: $alreadyUsedWords")
+
+        // se ponen de por si comillas en el hash
         val stringWriter = StringWriter()
         CSVWriter(stringWriter).use { csvWriter ->
-            originalUrls.zip(processedUrls).forEach { (originalUrl, processedUrl) ->
-                csvWriter.writeNext(arrayOf(originalUrl, processedUrl))
+            // originalUrls.zip(processedUrls).forEach { (originalUrl, processedUrl) ->
+            //     csvWriter.writeNext(arrayOf(originalUrl, processedUrl))
+            // }
+            originalUrls.zip(processedUrls.zip(alreadyUsedWords)).forEach { (originalUrl, pair) ->
+                val (processedUrl, alreadyUsedWord) = pair
+                csvWriter.writeNext(arrayOf(originalUrl, processedUrl, alreadyUsedWord.toString()))
             }
+
+
         }
 
         return stringWriter.toString()
