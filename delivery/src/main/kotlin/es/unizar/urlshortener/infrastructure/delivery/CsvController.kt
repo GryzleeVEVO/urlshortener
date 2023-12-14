@@ -102,8 +102,13 @@ class CsvControllerImpl(
                 } else {
                     linkTo<UrlShortenerControllerImpl> { redirectTo(processedUrl, request) }.toUri()
                 }
+                
+                var mensajeError = ""
+                if (alreadyUsedWords.toBoolean()){
+                    mensajeError = "the custom word [$processedUrl] is already in use"
+                }
 
-                "$originalUrl,$fullUrl"
+                "$originalUrl,$fullUrl,$mensajeError"
             } else {
                 // Handle the case where the line does not contain the expected format
                 "Invalid line format: $line"
