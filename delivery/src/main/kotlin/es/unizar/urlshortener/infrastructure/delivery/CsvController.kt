@@ -95,17 +95,19 @@ class CsvControllerImpl(
         val csvContentWithFullUrls = cadenaResultado.lines().map { line ->
             val splitLine = line.split(",")
             if (splitLine.size >= 2) {
-                val (originalUrl, processedUrl, alreadyUsedWords) = splitLine
+                val (originalUrl, processedUrl, errorProcessing) = splitLine
 
-                val fullUrl = if (alreadyUsedWords.toBoolean()) {
+                val fullUrl = if (errorProcessing == "ALREADY_EXISTS" || errorProcessing == "WRONG_FORMAT" ) {
                     ""
                 } else {
                     linkTo<UrlShortenerControllerImpl> { redirectTo(processedUrl, request) }.toUri()
                 }
                 
                 var mensajeError = ""
-                if (alreadyUsedWords.toBoolean()){
+                if (errorProcessing == "ALREADY_EXISTS"){
                     mensajeError = "the custom word [$processedUrl] is already in use"
+                } else if (errorProcessing == "WRONG_FORMAT") {
+                    mensajeError = "must be an http or https URI"
                 }
 
                 "$originalUrl,$fullUrl,$mensajeError"

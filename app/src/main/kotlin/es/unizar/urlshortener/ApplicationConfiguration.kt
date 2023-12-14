@@ -53,5 +53,5 @@ class ApplicationConfiguration(
 
     @Bean
     fun csvUseCase() =
-        CsvUseCaseImpl(shortUrlRepositoryService(), csvService())
+        CsvUseCaseImpl(shortUrlRepositoryService(), validatorService(), csvService())
 }
