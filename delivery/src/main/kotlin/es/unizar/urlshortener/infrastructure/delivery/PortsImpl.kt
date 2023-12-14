@@ -58,18 +58,18 @@ class HashServiceImpl : HashService {
 }
 
 class CsvServiceImpl : CsvService {
-    override fun csvHasUrl(csvFile: List<String>, customText: String): List<String> {
+    override fun csvHasUrl(csvFile: List<String>, customWords: List<String>): List<String> {
         // Lista dinámica para almacenar el resultado
         val processedUrls = mutableListOf<String>()
 
         // Iterar sobre cada URL en la lista
-        for (url in csvFile) {
+        for (i in csvFile.indices) {
             // Instancia de hasServiceImp
             val hashServiceInstance = HashServiceImpl()
 
             // Procesar la URL con la función hasUrl
             // (por ahora no se tiene en cuenta el custom, habría que tener una lista de string)
-            val result = hashServiceInstance.hasUrl(url, "") //customText
+            val result = hashServiceInstance.hasUrl(csvFile[i], customWords[i]) //customText
 
             // Agregar el resultado a la lista de URLs procesadas
             processedUrls.add(result)

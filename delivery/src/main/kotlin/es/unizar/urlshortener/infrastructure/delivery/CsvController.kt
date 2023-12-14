@@ -16,43 +16,27 @@ import org.springframework.hateoas.server.mvc.linkTo
 
 import es.unizar.urlshortener.core.ClickProperties
 import org.springframework.web.bind.annotation.PathVariable
-// import es.unizar.urlshortener.core.usecases.LogClickUseCase
-// import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import java.net.URI
 
 interface CsvController {
-    //fun redirectTo(id: String, request: HttpServletRequest): ResponseEntity<Unit>
-    /**
-     * Genera y devuelve un csv en funcion del csv de entrada y del texto personalizado(aun no)
-     */
-    //@RequestPart("customText") customText: String = ""
 
-    //request: HttpServletRequest
+    /**
+     * Genera y devuelve un csv en funcion del csv de entrada y del texto personalizado
+     */
     fun generateCsv(
-    @RequestPart("csvFile") csvFile: MultipartFile,
-    @RequestPart("customText") customText: String?,
-    request: HttpServletRequest    
-): ResponseEntity<String>
+        @RequestPart("csvFile") csvFile: MultipartFile,
+        @RequestPart("customText") customText: String?,
+        request: HttpServletRequest    
+    ): ResponseEntity<String>
 }
 
 /**
  * Implementacion del controlador csv
  */
-
- //request: HttpServletRequest
 @RestController
 class CsvControllerImpl(
     private val csvUseCase: CsvUseCase
 ) : CsvController {
-
-    // @PostMapping("/{id:(?!api|index).*}")
-    // override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
-    //     redirectUseCase.redirectTo(id).let {
-    //         logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
-    //         val h = HttpHeaders()
-    //         h.location = URI.create(it.target)
-    //         ResponseEntity<Unit>(h, HttpStatus.valueOf(it.mode))
-    //     }
 
     @PostMapping("/api/bulk", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     override fun generateCsv(
@@ -68,8 +52,14 @@ class CsvControllerImpl(
         val csvContent = readUrlsFromCsv(csvFile)
         println("Primera componente del csv: ${csvContent[0]}")
 
+        //separar urls de customWord (si contiene palabras personalizadas)
+        val csvUrls = csvContent.map { it.split(",")[0] }
+        val csvWords = csvContent.map { if (it.contains(",")) it.split(",")[1] else "" }
+        println("URLs: $csvUrls")
+        println("Palabras: $csvWords")
+
         // Llamar al caso de uso para generar el CSV
-        val csvContentResult = csvUseCase.createCsv(csvContent, "", ip) //customText
+        val csvContentResult = csvUseCase.createCsv(csvUrls, csvWords, ip) //customText
 
         // eliminar las comillas innecesarias
         var cadenaResultado = ""

@@ -14,19 +14,19 @@ import java.io.StringWriter
 
 
 /*
- * Dada una lista de customText (POR AHORA ESO NO) y un fichero csv en el que cada 
+ * Dada una lista de customText y un fichero csv en el que cada 
  * fila de la primera columna es una URL se devuelve un string con las URL acortadas
  * Cuando se crean, se pueden agregar datos opcionales (data)
  */
 interface CsvUseCase {
-    fun createCsv(csvContent: List<String>, customText: String, ipParam: String): String
+    fun createCsv(csvContent: List<String>, customWords: List<String>, ipParam: String): String
 }
 
 class CsvUseCaseImpl(
     private val shortUrlRepository: ShortUrlRepositoryService,
     private val csvService: CsvService
 ) : CsvUseCase {
-    override fun createCsv(csvContent: List<String>, customText: String, ipParam: String): String {
+    override fun createCsv(csvContent: List<String>, customWords: List<String>, ipParam: String): String {
         // Obtener una lista<string> con las URL originales
         val originalUrls = mutableListOf<String>()
         csvContent.forEach { url ->
@@ -34,8 +34,11 @@ class CsvUseCaseImpl(
             originalUrls.add(url)
         }
 
+        //separar la lista de urls de la lista de customWord (mejor hacerlo en el controller)
+
+
         // Obtener una lista<string> con las URL recortadas
-        val processedUrls = csvService.csvHasUrl(csvContent, customText)
+        val processedUrls = csvService.csvHasUrl(csvContent, customWords)
         
         // ASI NO DEPENDO DE csvHashUrl        
         // Lista dinámica para almacenar el resultado
@@ -50,16 +53,24 @@ class CsvUseCaseImpl(
             println("Redireccion a: ${csvContent[i]}")
             println("Hash: ${processedUrls[i]}")
             println("Direccion IP del cliente: $ipParam")
-            val su = ShortUrl(
-                hash = processedUrls[i],
-                redirection = Redirection(target = csvContent[i]),
-                properties = ShortUrlProperties(
-                    ip = ipParam,
-                )
-            )  
-            shortUrlRepository.save(su)
+            shortUrlRepository.findByKey(processedUrls[i])?.let{
+                println("YA ESTA EN LA BDDDDDDDDDDD")
+                //sustituir la url recortada por vacio
+                //processedUrls[i] = ""
+            }?: run {
+            // else{
+                println("NO ESTA EN LA BDDDDDDDDDDD")
+                val su = ShortUrl(
+                    hash = processedUrls[i],
+                    redirection = Redirection(target = csvContent[i]),
+                    properties = ShortUrlProperties(
+                        ip = ipParam,
+                    )
+                )  
+                shortUrlRepository.save(su)
+            }
         }
-        
+
         // se ponen comillas en el hash
         val stringWriter = StringWriter()
         CSVWriter(stringWriter).use { csvWriter ->
