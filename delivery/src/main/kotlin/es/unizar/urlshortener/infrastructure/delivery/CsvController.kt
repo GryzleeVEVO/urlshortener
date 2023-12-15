@@ -60,9 +60,9 @@ class CsvControllerImpl(
         csvContentCopy.take(1).forEach { line ->
             val headers = line.split(",")
             println(headers)
-            if (headers[0] != "URI" && headers[1] != "CUSTOM"){
+            if (headers[0] != "URI" && headers[1] != "Custom_Word"){
                 println("Las cabeceras no son correctas")
-                throw CsvWrongHeaders("URI,CUSTOM")
+                throw CsvWrongHeaders("URI,Custom_Word")
             }
             println("Las cabeceras estan bien")
         }
@@ -129,31 +129,38 @@ class CsvControllerImpl(
 
         // ESTE ES EL BUENO (quita los hash que ya se han usado)
         var encontrada = false
+        var primeraLinea = true
         var firstShortenedUrl: String = ""
         val csvContentWithFullUrls = cadenaResultado.lines().map { line ->
             val splitLine = line.split(",")
             if (splitLine.size >= 2) {
-                val (originalUrl, processedUrl, errorProcessing) = splitLine
-
-                val fullUrl = if (errorProcessing == "ALREADY_EXISTS" || errorProcessing == "WRONG_FORMAT" ) {
-                    ""
-                } else {
-                    linkTo<UrlShortenerControllerImpl> { redirectTo(processedUrl, request) }.toUri()
+                if (primeraLinea){
+                    primeraLinea = false
+                    "URI,URI_Recortada,Mensaje"
                 }
-                
-                var mensajeError = ""
-                if (errorProcessing == "ALREADY_EXISTS"){
-                    mensajeError = "the custom word [$processedUrl] is already in use"
-                } else if (errorProcessing == "WRONG_FORMAT") {
-                    mensajeError = "must be an http or https URI"
-                }else if (!encontrada){ //si no tiene error esa linea
-                    encontrada = true
-                    //coger la primera url acortada para la cabecera Location
-                    println("Primera URL acortada: $fullUrl")
-                    firstShortenedUrl = "$fullUrl"
-                }
+                else{
+                    val (originalUrl, processedUrl, errorProcessing) = splitLine
 
-                "$originalUrl,$fullUrl,$mensajeError"
+                    val fullUrl = if (errorProcessing == "ALREADY_EXISTS" || errorProcessing == "WRONG_FORMAT" ) {
+                        ""
+                    } else {
+                        linkTo<UrlShortenerControllerImpl> { redirectTo(processedUrl, request) }.toUri()
+                    }
+                    
+                    var mensajeError = ""
+                    if (errorProcessing == "ALREADY_EXISTS"){
+                        mensajeError = "the custom word [$processedUrl] is already in use"
+                    } else if (errorProcessing == "WRONG_FORMAT") {
+                        mensajeError = "must be an http or https URI"
+                    }else if (!encontrada){ //si no tiene error esa linea
+                        encontrada = true
+                        //coger la primera url acortada para la cabecera Location
+                        println("Primera URL acortada: $fullUrl")
+                        firstShortenedUrl = "$fullUrl"
+                    }
+
+                    "$originalUrl,$fullUrl,$mensajeError"
+                }
             } else {
                 // Handle the case where the line does not contain the expected format
                 ""
@@ -174,7 +181,7 @@ class CsvControllerImpl(
         // Configurar la respuesta HTTP
         val headers = HttpHeaders()
         headers.contentType = MediaType.parseMediaType("text/csv")
-        headers.setContentDispositionFormData("attachment", "output.csv")
+        headers.setContentDispositionFormData("attachment", "ShortUrlCollection.csv")
         headers.location = URI.create(firstShortenedUrl)
             // Devolver la respuesta HTTP con el contenido del CSV
         return ResponseEntity(csvContentWithFullUrls, headers, HttpStatus.CREATED)
