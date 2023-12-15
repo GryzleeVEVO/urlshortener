@@ -1,4 +1,4 @@
-@file:Suppress("WildcardImport")
+@file:Suppress("WildcardImport","LongMethod","CyclomaticComplexMethod")
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.usecases.CsvUseCase
@@ -51,9 +51,22 @@ class CsvControllerImpl(
         println("Direccion IP del cliente: $ip")
 
         // Convertir MultipartFile a lista de strings
-        val csvContent = readUrlsFromCsv(csvFile)
-        
+        val csvContent = readUrlsFromCsv(csvFile).toMutableList()
+        val csvContentCopy = csvContent
+
         //extraer y analizar las cabeceras
+        //val validHeaders = setOf("URI", "CUSTOM")
+        println("Cabeceras del CSV:")
+        csvContentCopy.take(1).forEach { line ->
+            val headers = line.split(",")
+            println(headers)
+            if (headers[0] != "URI" && headers[1] != "CUSTOM"){
+                println("Las cabeceras no son correctas")
+                throw CsvWrongHeaders("URI,CUSTOM")
+            }
+            println("Las cabeceras estan bien")
+        }
+
 
         //ver si el numero de columnas es el correcto
         val validColumnCounts = setOf(1, 2)
@@ -64,6 +77,14 @@ class CsvControllerImpl(
             //ResponseEntity("CSV con más columnas de las permitidas", HttpStatus.BAD_REQUEST)
             throw CsvColumnsNotExpected("2")
         }
+        
+        // quitar cabeceras para el procesado
+        for (j in csvContent.indices){
+            if (j > 0){
+                csvContent[j-1] = csvContent[j]
+            }
+        }
+        csvContent.removeAt(csvContent.size - 1)
 
         println("Primera componente del csv: ${csvContent[0]}")
 
@@ -149,7 +170,6 @@ class CsvControllerImpl(
         //     println("Primera URL acortada: $firstShortenedUrl")
         //     break
         // }
-        
 
         // Configurar la respuesta HTTP
         val headers = HttpHeaders()

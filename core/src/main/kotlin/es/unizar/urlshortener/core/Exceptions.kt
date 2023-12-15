@@ -9,3 +9,5 @@ class UnsafeUrlException(url: String) : Exception("[$url] is not safe")
 class UsedCustomWordException(customText: String) : Exception("the custom word [$customText] is already in use")
 
 class CsvColumnsNotExpected(number: String): Exception("the number of columns is not expected, [$number] expected")
+
+class CsvWrongHeaders(headers: String): Exception("the headers are incorrect, they must be [$headers]")
