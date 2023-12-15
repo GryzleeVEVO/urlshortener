@@ -92,6 +92,8 @@ class CsvControllerImpl(
         */
 
         // ESTE ES EL BUENO (quita los hash que ya se han usado)
+        var encontrada = false
+        var firstShortenedUrl: String = ""
         val csvContentWithFullUrls = cadenaResultado.lines().map { line ->
             val splitLine = line.split(",")
             if (splitLine.size >= 2) {
@@ -108,24 +110,30 @@ class CsvControllerImpl(
                     mensajeError = "the custom word [$processedUrl] is already in use"
                 } else if (errorProcessing == "WRONG_FORMAT") {
                     mensajeError = "must be an http or https URI"
+                }else if (!encontrada){ //si no tiene error esa linea
+                    encontrada = true
+                    //coger la primera url acortada para la cabecera Location
+                    println("Primera URL acortada: $fullUrl")
+                    firstShortenedUrl = "$fullUrl"
                 }
 
                 "$originalUrl,$fullUrl,$mensajeError"
             } else {
                 // Handle the case where the line does not contain the expected format
-                "Invalid line format: $line"
+                ""
             }
         }.joinToString("\n")
 
-
-        //coger la primera url acortada para la cabecera location
-        val lines = csvContentWithFullUrls.trim().split("\n")
-        var firstShortenedUrl: String = ""
-        for (line in lines) {
-            firstShortenedUrl = line.substringAfter(",")
-            println("Primera URL acortada: $firstShortenedUrl")
-            break
-        }
+        //(ESTO AHORA ESTA DENTRO DEL CODIGO DE ARRIBA DONDE SE PONE EL TIPO DE ERROR, 
+        //  SI NO HAY ERROR ES QUE LA URL ACORTADA ES VALIDA Y SE COGE A PRIMERA) 
+        //coger la primera url acortada para la cabecera location 
+        // val lines = csvContentWithFullUrls.trim().split("\n")
+        // var firstShortenedUrl: String = ""
+        // for (line in lines) {
+        //     firstShortenedUrl = line.substringAfter(",")
+        //     println("Primera URL acortada: $firstShortenedUrl")
+        //     break
+        // }
         
 
         // Configurar la respuesta HTTP

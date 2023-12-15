@@ -1,4 +1,4 @@
-@file:Suppress("WildcardImport")
+@file:Suppress("WildcardImport","Detekt.NestedBlockDepth")
 
 package es.unizar.urlshortener.core.usecases
 
@@ -56,27 +56,36 @@ class CsvUseCaseImpl(
             println("Redireccion a: ${csvContent[i]}")
             println("Hash: ${processedUrls[i]}")
             println("Direccion IP del cliente: $ipParam")
-            shortUrlRepository.findByKey(processedUrls[i])?.let{
-                println("YA ESTA EN LA BDDDDDDDDDDD")
-                //sustituir la url recortada por vacio
-                errorProcessing.add("ALREADY_EXISTS")
-            }?: run {
-                if (validatorService.isValid(csvContent[i])) {
-                    println("NO ESTA EN LA BDDDDDDDDDDD")
-                    val su = ShortUrl(
-                        hash = processedUrls[i],
-                        redirection = Redirection(target = csvContent[i]),
-                        properties = ShortUrlProperties(
-                            ip = ipParam,
-                        )
-                    )  
-                    shortUrlRepository.save(su)
-                    errorProcessing.add("")
-                } else {
-                    println("No guardado en la BD porque no cumple el formato de url")
-                    errorProcessing.add("WRONG_FORMAT")
+
+            
+                shortUrlRepository.findByKey(processedUrls[i])?.let{
+                    if (customWords[i] != ""){
+                        println("YA ESTA EN LA BDDDDDDDDDDD")
+                        //sustituir la url recortada por vacio
+                        errorProcessing.add("ALREADY_EXISTS")
+                    } else{
+                        println("CustomWord: no tiene custom word")
+                        errorProcessing.add("")
+                    }
+                }?: run {
+                    if (validatorService.isValid(csvContent[i])) {
+                        println("NO ESTA EN LA BDDDDDDDDDDD")
+                        val su = ShortUrl(
+                            hash = processedUrls[i],
+                            redirection = Redirection(target = csvContent[i]),
+                            properties = ShortUrlProperties(
+                                ip = ipParam,
+                            )
+                        )  
+                        shortUrlRepository.save(su)
+                        errorProcessing.add("")
+                    } else {
+                        println("No guardado en la BD porque no cumple el formato de url")
+                        errorProcessing.add("WRONG_FORMAT")
+                    }
                 }
-            }
+            
+            
         }
 
         println("errorProcessing: $errorProcessing")
