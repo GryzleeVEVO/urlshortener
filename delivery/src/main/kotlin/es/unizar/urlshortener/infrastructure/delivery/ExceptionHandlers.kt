@@ -3,6 +3,7 @@ package es.unizar.urlshortener.infrastructure.delivery
 import es.unizar.urlshortener.core.InvalidUrlException
 import es.unizar.urlshortener.core.RedirectionNotFound
 import es.unizar.urlshortener.core.UsedCustomWordException
+import es.unizar.urlshortener.core.CsvColumnsNotExpected
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -29,6 +30,11 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [UsedCustomWordException::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun invalidUrls(ex: UsedCustomWordException) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
+
+    @ResponseBody
+    @ExceptionHandler(value = [CsvColumnsNotExpected::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun invalidCsvFomat(ex: CsvColumnsNotExpected) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 
 }
 

@@ -1,3 +1,4 @@
+@file:Suppress("WildcardImport")
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.usecases.CsvUseCase
@@ -17,6 +18,7 @@ import org.springframework.hateoas.server.mvc.linkTo
 import es.unizar.urlshortener.core.ClickProperties
 import org.springframework.web.bind.annotation.PathVariable
 import java.net.URI
+import es.unizar.urlshortener.core.*
 
 interface CsvController {
 
@@ -50,6 +52,19 @@ class CsvControllerImpl(
 
         // Convertir MultipartFile a lista de strings
         val csvContent = readUrlsFromCsv(csvFile)
+        
+        //extraer y analizar las cabeceras
+
+        //ver si el numero de columnas es el correcto
+        val validColumnCounts = setOf(1, 2)
+        val invalidLines = csvContent.filter { it.split(",").size !in validColumnCounts }
+        if (invalidLines.isNotEmpty()) {
+            println("ERROR: Hay más o menos columnas de las esperadas")
+            // throw InvalidUrlException("fdfsj")
+            //ResponseEntity("CSV con más columnas de las permitidas", HttpStatus.BAD_REQUEST)
+            throw CsvColumnsNotExpected("2")
+        }
+
         println("Primera componente del csv: ${csvContent[0]}")
 
         //separar urls de customWord (si contiene palabras personalizadas)
