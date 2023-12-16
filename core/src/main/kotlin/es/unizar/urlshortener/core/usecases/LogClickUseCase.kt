@@ -1,8 +1,6 @@
 package es.unizar.urlshortener.core.usecases
 
-import es.unizar.urlshortener.core.Click
-import es.unizar.urlshortener.core.ClickProperties
-import es.unizar.urlshortener.core.ClickRepositoryService
+import es.unizar.urlshortener.core.*
 
 /**
  * Log that somebody has requested the redirection identified by a key.
@@ -12,15 +10,16 @@ import es.unizar.urlshortener.core.ClickRepositoryService
     interface LogClickUseCase {
     fun logClick(key: String, data: ClickProperties)
 
-    // TODO
-    fun getClicksById()
+
+    fun getClicksByShortUrlHash(hash: String): List<ClickProperties>
 }
 
 /**
  * Implementation of [LogClickUseCase].
  */
 class LogClickUseCaseImpl(
-    private val clickRepository: ClickRepositoryService
+    private val clickRepository: ClickRepositoryService,
+    private val shortUrlRepository: ShortUrlRepositoryService
 ) : LogClickUseCase {
     override fun logClick(key: String, data: ClickProperties) {
         val cl = Click(
@@ -30,7 +29,12 @@ class LogClickUseCaseImpl(
         clickRepository.save(cl)
     }
 
-    override fun getClicksById() {
-        // TODO: Devuelve una lista de clicks realizados para una URL
+    override fun getClicksByShortUrlHash(hash: String) : List<ClickProperties> {
+        if (shortUrlRepository.findByKey(hash) != null) {
+            return clickRepository.findByShortUrlHash(hash).map { it.properties }
+        } else {
+            throw RedirectionNotFound(hash)
+        }
     }
+
 }

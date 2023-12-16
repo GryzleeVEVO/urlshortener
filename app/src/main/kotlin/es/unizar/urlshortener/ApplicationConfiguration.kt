@@ -40,7 +40,7 @@ class ApplicationConfiguration(
     fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
 
     @Bean
-    fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
+    fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService(), shortUrlRepositoryService())
 
     @Bean
     fun parseHeaderUseCase() = ParseHeaderUseCaseImpl()

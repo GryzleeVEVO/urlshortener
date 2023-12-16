@@ -38,8 +38,8 @@ interface UrlShortenerController {
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
 
 
-    // TODO
-    //fun statistics(request: HttpServletRequest): ResponseEntity<>
+
+    fun statistics(id:String, request: HttpServletRequest): ResponseEntity<ClickStatsDataOut>
 }
 
 /**
@@ -54,6 +54,13 @@ data class ShortUrlDataIn(
  */
 data class ShortUrlDataOut(
     val url: URI? = null, val properties: Map<String, Any> = emptyMap()
+)
+
+/**
+ * Data returned after getting statistics for logged clicks for a short URL.
+ */
+data class ClickStatsDataOut(
+    val url: URI, val clicks: List<ClickProperties> = emptyList()
 )
 
 /**
@@ -99,10 +106,16 @@ class UrlShortenerControllerImpl(
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
 
-    /*
+
     @GetMapping("/api/link/{id:(?!api|index).*}")
-    override fun statistics(request: HttpServletRequest): ResponseEntity<> {
-    // TODO: Implementar un resumen para una url acortada
+    override fun statistics(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClickStatsDataOut> {
+        val url = linkTo<UrlShortenerControllerImpl> { redirectTo(id, request) }.toUri()
+
+        logClickUseCase.getClicksByShortUrlHash(id).let {
+            val response = ClickStatsDataOut(
+                url = url, clicks = it
+            )
+            return ResponseEntity<ClickStatsDataOut>(response, HttpStatus.OK)
+        }
     }
-    */
 }
