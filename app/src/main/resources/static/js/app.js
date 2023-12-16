@@ -37,7 +37,7 @@ $(document).ready(
                     // La variable "data" contiene la respuesta del servidor.
                     // Manejar la respuesta del servidor con el contenido del CSV procesado
                     var resultHtml = "<div class='alert alert-success lead'>CSV procesado:<br>";
-                    resultHtml += "<a href='data:text/csv;charset=utf-8," + encodeURIComponent(data) + "' download='output.csv'>Download CSV</a>";
+                    resultHtml += "<a href='data:text/csv;charset=utf-8," + encodeURIComponent(data) + "' download='ShortUrlCollection.csv'>Download CSV</a>";
                     resultHtml += "</div>";
 
                     $("#result").html(resultHtml);
