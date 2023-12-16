@@ -17,5 +17,5 @@ interface ShortUrlEntityRepository : JpaRepository<ShortUrlEntity, String> {
  * **Note**: Spring Boot is able to discover this [JpaRepository] without further configuration.
  */
 interface ClickEntityRepository : JpaRepository<ClickEntity, Long> {
-    fun findTop200ByHash(hash: String): List<ClickEntity>
+    fun findByHash(hash: String): List<ClickEntity>
 }
