@@ -37,7 +37,11 @@ interface UrlShortenerController {
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
 
-
+    /**
+     * Generates a QR code for the provided short URL identifier [id].
+     *
+     * Note: Utilizes the [QrUseCase] for QR code creation.
+     */
     fun getQrCode(id: String, request: HttpServletRequest): ResponseEntity<String>
 
 }
@@ -111,8 +115,7 @@ class UrlShortenerControllerImpl(
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
 
-
-    @GetMapping("/{id:(?!api|index).*}/qr")
+    @GetMapping("/{id:(?!api|index).*}/qr", produces = [MediaType.IMAGE_PNG_VALUE])
     override fun getQrCode(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<String> {
 
         println("GET QR Code called for id: $id")
@@ -121,6 +124,7 @@ class UrlShortenerControllerImpl(
 
         if (qrCode) {
             val redirectUrl = linkTo<UrlShortenerControllerImpl> { redirectTo(id, request) }.toUri().toString()
+            println(redirectUrl)
             val qrCodeBytes = qrCodeUseCase.createQrCode(redirectUrl)
 
             val headers = HttpHeaders()

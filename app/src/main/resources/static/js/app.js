@@ -35,11 +35,11 @@ $(document).ready(function () {
     $("#shortener").submit(function (event) {
         event.preventDefault();
 
-        // Prüfen, ob die Checkbox ausgewählt ist
+        // Prove whether QR option is checked
         var generateQrCode = $("#qr").prop("checked");
         console.log(generateQrCode);
 
-        // Daten für die Serialisierung vorbereiten
+        // Serialize Data and put in manually QR Option
         var formData = $(this).serializeArray();
         formData.push({ name: "qr", value: generateQrCode });
 
@@ -54,12 +54,12 @@ $(document).ready(function () {
                     + request.getResponseHeader('Location')
                     + "</a></div>");
 
-                // Extrahieren Sie den Hash-Wert vom Ende der URL
+                // Extracting hash from URL
                 var extractedHash = extractHashFromUrl(response.url);
 
                 console.log(extractedHash);
 
-                // Prüfen, ob die Checkbox ausgewählt ist, bevor der QR-Code angezeigt wird
+                // Only calls getQrCode if checkbox is checked
                 if (generateQrCode) {
                     getQrCode(extractedHash);
                 }
@@ -70,7 +70,7 @@ $(document).ready(function () {
         });
     });
 
-    // Funktion zum Abrufen des QR-Codes
+    // function to perform GET Request for given [id]. Path: /id/qr
     function getQrCode(id) {
         $.ajax({
             type: "GET",
@@ -84,8 +84,9 @@ $(document).ready(function () {
         });
     }
 
+    //function to extract the hash from a given url
     function extractHashFromUrl(url) {
-        // Hier die Anzahl der Zeichen, die Sie behalten möchten (in Ihrem Fall 8)
+        // extracts only the Hash from the URL
         var lengthToKeep = 8;
         return url.slice(-lengthToKeep);
     }

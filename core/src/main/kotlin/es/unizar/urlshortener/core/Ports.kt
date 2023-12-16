@@ -33,6 +33,11 @@ interface HashService {
     fun hasUrl(url: String): String
 }
 
+/**
+ * [QrCodeService] is the port of the service that creates a QR Code from a URL.
+ *
+ * **Note**: It is a design decision to create this port. It could be part of the core .
+ */
 interface QrCodeService {
     fun generateQrCode(url: String): String
 }

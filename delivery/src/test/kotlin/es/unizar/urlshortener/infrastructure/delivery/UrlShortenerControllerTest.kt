@@ -40,8 +40,9 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var createShortUrlUseCase: CreateShortUrlUseCase
 
-    //@MockBean
-    //private lateinit var qrUseCase: QrUseCase
+    @MockBean
+    private lateinit var qrUseCase: QrUseCase
+
     @Test
     fun `redirectTo returns a redirect when the key exists`() {
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
@@ -105,7 +106,7 @@ class UrlShortenerControllerTest {
     }
 
     @Test
-    fun `creates qr code`() {
+    fun `creates qr code when option is checked`() {
        given(
             createShortUrlUseCase.create(
                 url = "http://example.com/",
@@ -126,7 +127,7 @@ class UrlShortenerControllerTest {
     }
 
     @Test
-    fun `does not create qr code`() {
+    fun `does not create qr code when option not checked`() {
         given(
             createShortUrlUseCase.create(
                 url = "http://example.com/",
@@ -147,4 +148,24 @@ class UrlShortenerControllerTest {
 
 
     }
+
+    @Test
+    fun `getQrCode returns NOT_FOUND if key does not exist`() {
+
+        given(qrUseCase.canGenerateQrCode("a1b2c3d4")).willReturn(false)
+
+        mockMvc.perform(get("/{id}/qr", "a1b2c3d4"))
+            .andDo(print())
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `getQrCode returns OK if key does exist`() {
+
+        given(qrUseCase.canGenerateQrCode("a1b2c3d4")).willReturn(true)
+        mockMvc.perform(get("/{id}/qr", "a1b2c3d4"))
+            .andDo(print())
+            .andExpect(status().isOk)
+    }
+
 }

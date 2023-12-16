@@ -7,10 +7,20 @@ import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.QrCodeService
 
 
-// Tengo que comprobar si con esta ID existe una URL y que se puede generar un codigo QR
-// Si falla lanzar excecpiones (400 / 404) Not found se lanzaria aqui dentro
 interface QrUseCase {
+    /**
+     * Checks if a QR code can be generated for the specified short URL identifier.
+     *
+     * @param id The short URL identifier for which the QR code generation is queried.
+     * @return `true` if a QR code can be generated; otherwise, `false`.
+     */
     fun canGenerateQrCode(id: String): Boolean
+    /**
+     * Creates a QR code for the provided redirection URL.
+     *
+     * @param redirectUrl The URL to which the QR code will redirect.
+     * @return The generated QR code as a string.
+     */
     fun createQrCode(redirectUrl: String): String
 }
 
@@ -23,6 +33,8 @@ class QrCodeUseCaseImpl
     override fun canGenerateQrCode(id: String): Boolean {
         val shortUrl = shortUrlRepository.findByKey(id)
             ?: throw RedirectionNotFound("Short URL with ID $id not found") // 404 Not Found
+
+
         println(shortUrl)
         shortUrl.properties.qr = true
         return true
