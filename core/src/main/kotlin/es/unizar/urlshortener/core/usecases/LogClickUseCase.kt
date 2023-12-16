@@ -11,6 +11,9 @@ import es.unizar.urlshortener.core.ClickRepositoryService
  */
     interface LogClickUseCase {
     fun logClick(key: String, data: ClickProperties)
+
+    // TODO
+    fun getClicksById()
 }
 
 /**
@@ -25,5 +28,9 @@ class LogClickUseCaseImpl(
             properties = data
         )
         clickRepository.save(cl)
+    }
+
+    override fun getClicksById() {
+        // TODO: Devuelve una lista de clicks realizados para una URL
     }
 }

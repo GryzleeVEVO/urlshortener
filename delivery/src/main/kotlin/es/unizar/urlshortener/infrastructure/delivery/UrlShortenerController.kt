@@ -36,6 +36,10 @@ interface UrlShortenerController {
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
+
+
+    // TODO
+    //fun statistics(request: HttpServletRequest): ResponseEntity<>
 }
 
 /**
@@ -68,10 +72,8 @@ class UrlShortenerControllerImpl(
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
         redirectUseCase.redirectTo(id).let {
-            val data = parseHeaderUseCase.parseHeader(
-                request.getHeader("User-Agent"),
-                ClickProperties(ip = request.remoteAddr)
-            )
+            val ipData = ClickProperties(ip = request.remoteAddr)
+            val data = parseHeaderUseCase.parseHeader(request.getHeader("User-Agent"), ipData)
 
             logClickUseCase.logClick(id, data)
             val h = HttpHeaders()
@@ -96,4 +98,11 @@ class UrlShortenerControllerImpl(
             )
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
+
+    /*
+    @GetMapping("/api/link/{id:(?!api|index).*}")
+    override fun statistics(request: HttpServletRequest): ResponseEntity<> {
+    // TODO: Implementar un resumen para una url acortada
+    }
+    */
 }

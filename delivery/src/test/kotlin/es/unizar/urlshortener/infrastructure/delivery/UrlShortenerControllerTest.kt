@@ -5,6 +5,7 @@ package es.unizar.urlshortener.infrastructure.delivery
 import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
 import es.unizar.urlshortener.core.usecases.LogClickUseCase
+import es.unizar.urlshortener.core.usecases.ParseHeaderUseCase
 import es.unizar.urlshortener.core.usecases.RedirectUseCase
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
@@ -42,15 +43,34 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var createShortUrlUseCase: CreateShortUrlUseCase
 
+    @MockBean
+    private lateinit var parseHeaderUseCase: ParseHeaderUseCase
+
     @Test
-    fun `redirectTo returns a redirect when the key exists`() {
+    fun `redirectTo returns a redirect when the key exists, no User-Agent info`() {
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
+        given(parseHeaderUseCase.parseHeader(null, ClickProperties(ip = "127.0.0.1"))).willReturn(ClickProperties(ip = "127.0.0.1"))
 
         mockMvc.perform(get("/{id}", "key"))
             .andExpect(status().isTemporaryRedirect)
             .andExpect(redirectedUrl("http://example.com/"))
 
         verify(logClickUseCase).logClick("key", ClickProperties(ip = "127.0.0.1"))
+    }
+
+    @Test
+    fun `redirectTo returns a redirect when the key exists, and there is User-Agent info`() {
+        // Mock user-agent obtained from https://deviceatlas.com/blog/list-of-user-agent-strings
+        val mockUserAgent = "Mozilla/5.0 (Linux; Android 10; SM-A205U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Mobile Safari/537.36"
+
+        given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
+        given(parseHeaderUseCase.parseHeader(mockUserAgent, ClickProperties(ip = "127.0.0.1"))).willReturn(ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X"))
+
+        mockMvc.perform(get("/{id}", "key").header("User-Agent", mockUserAgent))
+            .andExpect(status().isTemporaryRedirect)
+            .andExpect(redirectedUrl("http://example.com/"))
+
+        verify(logClickUseCase).logClick("key", ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X"))
     }
 
     @Test
