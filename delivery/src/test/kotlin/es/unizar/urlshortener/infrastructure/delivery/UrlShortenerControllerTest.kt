@@ -63,7 +63,8 @@ class UrlShortenerControllerTest {
         // Mock user-agent obtained from https://deviceatlas.com/blog/list-of-user-agent-strings
         // More User-Agents https://www.whatismybrowser.com/guides/the-latest-user-agent/windows
         val mockUserAgent =
-            "Mozilla/5.0 (Linux; Android 10; SM-A205U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Mobile Safari/537.36"
+            "Mozilla/5.0 (Linux; Android 10; SM-A205U) AppleWebKit/537.36 (KHTML, like Gecko) " +
+        "Chrome/95.0.4638.54 Mobile Safari/537.36"
 
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
         given(parseHeaderUseCase.parseHeader(mockUserAgent, ClickProperties(ip = "127.0.0.1"))).willReturn(

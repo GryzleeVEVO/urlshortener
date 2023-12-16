@@ -1,3 +1,4 @@
+@file:Suppress("WildcardImport","MatchingDeclarationName")
 package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.*

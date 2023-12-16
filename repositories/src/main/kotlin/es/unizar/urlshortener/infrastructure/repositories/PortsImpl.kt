@@ -11,7 +11,8 @@ import es.unizar.urlshortener.core.ShortUrlRepositoryService
 class ClickRepositoryServiceImpl(
     private val clickEntityRepository: ClickEntityRepository
 ) : ClickRepositoryService {
-    override fun findByShortUrlHash(id: String): List<Click> = clickEntityRepository.findByHash(id).map { it.toDomain() }
+    override fun findByShortUrlHash(id: String): List<Click> = clickEntityRepository
+        .findByHash(id).map { it.toDomain() }
 
     override fun save(cl: Click): Click = clickEntityRepository.save(cl.toEntity()).toDomain()
 }

@@ -4,8 +4,8 @@ interface GetGeolocationUseCase {
     fun getGeolocation()
 }
 
-class GetGeolocationUseCaseImpl() : GetGeolocationUseCase {
-    override fun getGeolocation() {
+//class GetGeolocationUseCaseImpl() : GetGeolocationUseCase {
+    //override fun getGeolocation() {
 
-    }
-}
+   // }
+//}
