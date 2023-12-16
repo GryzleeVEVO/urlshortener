@@ -11,3 +11,5 @@ class UsedCustomWordException(customText: String) : Exception("the custom word [
 class CsvColumnsNotExpected(number: String): Exception("the number of columns is not expected, [$number] expected")
 
 class CsvWrongHeaders(headers: String): Exception("the headers are incorrect, they must be [$headers]")
+
+class CsvNotEnoughRows(message: String) : RuntimeException(message)

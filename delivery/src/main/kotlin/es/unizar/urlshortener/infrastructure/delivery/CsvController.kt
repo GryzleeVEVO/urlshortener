@@ -54,6 +54,11 @@ class CsvControllerImpl(
         val csvContent = readUrlsFromCsv(csvFile).toMutableList()
         val csvContentCopy = csvContent
 
+        // ver si hay al menos 2 lineas
+        if (csvContent.size < 2) {
+            throw CsvNotEnoughRows("The csv file must have two or more lines")
+        }
+
         //extraer y analizar las cabeceras
         //val validHeaders = setOf("URI", "CUSTOM")
         println("Cabeceras del CSV:")

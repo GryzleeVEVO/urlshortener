@@ -4,6 +4,7 @@ import es.unizar.urlshortener.core.InvalidUrlException
 import es.unizar.urlshortener.core.RedirectionNotFound
 import es.unizar.urlshortener.core.UsedCustomWordException
 import es.unizar.urlshortener.core.CsvColumnsNotExpected
+import es.unizar.urlshortener.core.CsvNotEnoughRows
 import es.unizar.urlshortener.core.CsvWrongHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -41,6 +42,11 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [CsvWrongHeaders::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun invalidCsvHeaders(ex: CsvWrongHeaders) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
+
+    @ResponseBody
+    @ExceptionHandler(value = [CsvNotEnoughRows::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun lessCsvLines(ex: CsvNotEnoughRows) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 
 }
 
