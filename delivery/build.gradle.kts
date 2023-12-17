@@ -10,6 +10,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("commons-validator:commons-validator:${Version.COMMONS_VALIDATOR}")
     implementation("com.google.guava:guava:${Version.GUAVA}")
+    implementation ("com.google.zxing:core:3.4.1")
+    implementation ("com.google.zxing:javase:3.4.1")
+
     implementation("com.opencsv:opencsv:5.7.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

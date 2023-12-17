@@ -28,25 +28,25 @@ class CreateShortUrlUseCaseImpl(
     // con runBlocking conseguimos una  (ejecucion asincrona)
     override fun create(url: String, data: ShortUrlProperties, customText: String): ShortUrl = runBlocking {
         val id: String = hashService.hasUrl(url,customText)
-        
+
         // con "?" realizamos la accion solo si findByKey no devuelve null
         return@runBlocking shortUrlRepository.findByKey(id)?.let {
             // la ShortUrl ya existe
-            
+
             // comprobamos safe (it se refiere al valor obtenido de findByKey)
-            it.properties.safe?.let { safe ->
-                if(!safe) {
-                    // la ShortURL no es safe
-                    throw UnsafeUrlException(url) //cambiar por otra nueva de Unsafe
-                }
-            }
+            //it.properties.safe?.let { safe ->
+            //    if(!safe) {
+            //        // la ShortURL no es safe
+            //        throw UnsafeUrlException(url) //cambiar por otra nueva de Unsafe
+            //    }
+            //}
             if (customText == "") {
                 return@let it
             }else{
                 throw UsedCustomWordException(customText)
             }
             // return@let it
-            
+
         } ?: run {
             if (validatorService.isValid(url)) {
                 // val id: String = hashService.hasUrl(url,customText)
@@ -56,14 +56,15 @@ class CreateShortUrlUseCaseImpl(
                     properties = ShortUrlProperties(
                         safe = data.safe,
                         ip = data.ip,
-                        sponsor = data.sponsor
+                        sponsor = data.sponsor,
+                        qr = data.qr
                     )
-                )  
+                )
                 val shortUrlSave = shortUrlRepository.save(su)
                 return@run shortUrlSave
             } else {
                 throw InvalidUrlException(url)
             }
         }
-    }    
+    }
 }

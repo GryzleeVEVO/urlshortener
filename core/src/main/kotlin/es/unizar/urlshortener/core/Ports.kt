@@ -44,3 +44,7 @@ interface HashService {
 interface CsvService {
     fun csvHasUrl(csvFile: List<String>, customWords: List<String>): List<String>  
 }
+
+interface QrCodeService {
+    fun generateQrCode(url: String): String
+}
