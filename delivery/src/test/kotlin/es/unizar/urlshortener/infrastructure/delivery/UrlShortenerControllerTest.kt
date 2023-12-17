@@ -64,22 +64,25 @@ class UrlShortenerControllerTest {
         // Mock user-agent obtained from https://deviceatlas.com/blog/list-of-user-agent-strings
         // More User-Agents https://www.whatismybrowser.com/guides/the-latest-user-agent/windows
         val mockUserAgent =
-            "Mozilla/5.0 (Linux; Android 10; SM-A205U) AppleWebKit/537.36 (KHTML, like Gecko) " + "Chrome/95.0.4638.54 Mobile Safari/537.36"
+            "Mozilla/5.0 (Linux; Android 10; SM-A205U) AppleWebKit/537.36 (KHTML, like Gecko) " +
+                    "Chrome/95.0.4638.54 Mobile Safari/537.36"
 
         given(redirectUseCase.redirectTo("key"))
             .willReturn(Redirection("http://example.com/"))
-        given(parseHeaderUseCase.parseHeader(mockUserAgent, ClickProperties(ip = "127.0.0.1")))
-            .willReturn(ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X"))
-        given(geolocationUseCase.getGeolocation("127.0.0.1", ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X")))
-            .willReturn(ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X", country = "Spain"))
+        given(parseHeaderUseCase.parseHeader(mockUserAgent, ClickProperties(ip = "155.210.33.10")))
+            .willReturn(ClickProperties(ip = "155.210.33.10", browser = "Safari", platform = "Mac OS X"))
+        given(geolocationUseCase.getGeolocation("155.210.33.10",
+            ClickProperties(ip = "155.210.33.10", browser = "Safari", platform = "Mac OS X")))
+            .willReturn(ClickProperties(
+                ip = "155.210.33.10", browser = "Safari", platform = "Mac OS X", country = "Spain"))
 
         mockMvc.perform(get("/{id}", "key")
-            //.remoteAddress("155.210.33.10")
+            .remoteAddress("155.210.33.10")
             .header("User-Agent", mockUserAgent)).andExpect(status().isTemporaryRedirect)
             .andExpect(redirectedUrl("http://example.com/"))
 
         verify(logClickUseCase).logClick(
-            "key", ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X", country = "Spain")
+            "key", ClickProperties(ip = "155.210.33.10", browser = "Safari", platform = "Mac OS X", country = "Spain")
         )
     }
 
@@ -157,7 +160,7 @@ class UrlShortenerControllerTest {
             .andExpect(jsonPath("$.clicks[0].ip").value("127.0.0.1"))
             .andExpect(jsonPath("$.clicks[0].browser").value("Edge"))
             .andExpect(jsonPath("$.clicks[0].platform").value("Windows"))
-            .andExpect(jsonPath("$.clicks[0].country").doesNotExist()) // Assuming it should not exist in this case
+            .andExpect(jsonPath("$.clicks[0].country").doesNotExist())
             .andExpect(jsonPath("$.clicks[1].ip").value("155.210.157.11"))
             .andExpect(jsonPath("$.clicks[1].browser").value("Safari"))
             .andExpect(jsonPath("$.clicks[1].platform").value("Mac OS X"))
@@ -167,4 +170,6 @@ class UrlShortenerControllerTest {
             .andExpect(jsonPath("$.clicks[2].platform").value("Android"))
             .andExpect(jsonPath("$.clicks[2].country").value("France"))
     }
+
+
 }

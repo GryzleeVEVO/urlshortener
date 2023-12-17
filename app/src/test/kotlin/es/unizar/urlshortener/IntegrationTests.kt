@@ -2,6 +2,7 @@
 
 package es.unizar.urlshortener
 
+import es.unizar.urlshortener.infrastructure.delivery.GeolocationServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ShortUrlDataOut
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.assertj.core.api.Assertions.assertThat
@@ -117,5 +118,21 @@ class HttpRequestTest {
             HttpEntity(data, headers),
             ShortUrlDataOut::class.java
         )
+    }
+
+    @Test
+    fun `GeolocationServiceImpl returns the correct IP if the IP is valid`() {
+        val geolocationService = GeolocationServiceImpl()
+        val ip = "155.210.33.10"
+
+        assert(geolocationService.getCountry(ip) == "Spain")
+    }
+
+    @Test
+    fun `GeolocationServiceImpl returns null if the IP is invalid`() {
+        val geolocationService = GeolocationServiceImpl()
+        val ip = "127.0.0.1"
+
+        assert(geolocationService.getCountry(ip) == null)
     }
 }
