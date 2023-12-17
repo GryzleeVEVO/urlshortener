@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.mock.web.MockMultipartFile
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 
 @WebMvcTest
 @ContextConfiguration(
@@ -48,6 +50,72 @@ class UrlShortenerControllerTest {
 
     @MockBean
     private lateinit var geolocationUseCase: GetGeolocationUseCase
+
+    //@MockBean
+    //private lateinit var csvUseCase: CsvUseCase
+
+    //Test csv
+    //@Test
+    fun `test CSV generation`() {
+        //Cargar el contenido del CSV
+        val csvContent = "URI,Custom_Word\nhttps://www.google.com/maps,Mapas"
+        val csvFile = MockMultipartFile("file", "ShortUrlCollection.csv", "text/csv", csvContent.toByteArray())
+
+        //Solicitud y verificacion de la respuesta
+        mockMvc.perform(
+                multipart("/api/bulk")
+                        .file(csvFile)
+                        .param("customText", "")
+        )
+                .andExpect(status().isCreated)
+                .andExpect(header().string("Location", "http://localhost:8080/Mapas"))
+                .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+                .andExpect(content().string("URI,URI_Recortada,Mensaje,URI_Qr\nhttps://www.google.com/maps,http://localhost:8080/Mapas,,http://localhost:8080/Mapas/qr"))
+    }
+
+    //Test customWord
+    @Test
+    fun `creates returns a basic redirect if it can compute a custom word`() {
+        given(
+                createShortUrlUseCase.create(
+                        url = "http://example.com/",
+                        data = ShortUrlProperties(ip = "127.0.0.1"),
+                        customText = "Example"
+                )
+        ).willReturn(ShortUrl("Example", Redirection("http://example.com/")))
+
+        mockMvc.perform(
+                post("/api/link")
+                        .param("url", "http://example.com/")
+                        .param("customText","Example")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        )
+                .andDo(print())
+                .andExpect(status().isCreated)
+                .andExpect(redirectedUrl("http://localhost/Example"))
+                .andExpect(jsonPath("$.url").value("http://localhost/Example"))
+    }
+
+    @Test
+    fun `returns 400 when a custom word is already in use`() {
+        given(
+                createShortUrlUseCase.create(
+                        url = "http://example.com/",
+                        data = ShortUrlProperties(ip = "127.0.0.1"),
+                        customText = "Example"
+                )
+        ).willAnswer{throw UsedCustomWordException("Example")}
+
+        mockMvc.perform(
+                post("/api/link")
+                        .param("url", "http://example.com/")
+                        .param("customText", "Example")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        )
+                .andDo(print())
+                .andExpect(status().isBadRequest)
+    }
+
 
     @Test
     fun `redirectTo returns a redirect when the key exists, no User-Agent info and geolocation available`() {
@@ -102,19 +170,20 @@ class UrlShortenerControllerTest {
         verify(logClickUseCase, never()).logClick("key", ClickProperties(ip = "127.0.0.1"))
     }
 
-    //@Test
+    @Test
     fun `creates returns a basic redirect if it can compute a hash`() {
         given(
             createShortUrlUseCase.create(
                 url = "http://example.com/",
                 data = ShortUrlProperties(ip = "127.0.0.1"),
-                customText = "custom"
+                customText = ""
             )
         ).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/")))
 
         mockMvc.perform(
             post("/api/link")
                 .param("url", "http://example.com/")
+                .param("customText","")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
         )
             .andDo(print())
@@ -129,7 +198,7 @@ class UrlShortenerControllerTest {
             createShortUrlUseCase.create(
                 url = "ftp://example.com/",
                 data = ShortUrlProperties(ip = "127.0.0.1"),
-                customText = "custom"
+                customText = ""
             )
         ).willAnswer { throw InvalidUrlException("ftp://example.com/") }
 
