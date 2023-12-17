@@ -1,4 +1,4 @@
-@file:Suppress("WildcardImport")
+@file:Suppress("WildcardImport","MaxLineLength")
 
 package es.unizar.urlshortener.infrastructure.delivery
 

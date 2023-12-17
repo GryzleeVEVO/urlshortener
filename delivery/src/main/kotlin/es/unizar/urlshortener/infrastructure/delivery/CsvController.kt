@@ -38,8 +38,7 @@ interface CsvController {
  */
 @RestController
 class CsvControllerImpl(
-    private val csvUseCase: CsvUseCase,
-    private val qrCodeUseCase: QrUseCase
+    private val csvUseCase: CsvUseCase
 ) : CsvController {
 
     @PostMapping("/api/bulk", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
