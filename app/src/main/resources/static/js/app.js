@@ -4,11 +4,11 @@ $(document).ready(
             function (event) {
                 event.preventDefault();
 
-                // Comprobar si la casilla de verificacion esta seleccionada
+                // Prove whether QR option is checked
                 var generateQrCode = $("#qr").prop("checked");
                 console.log(generateQrCode);
 
-                // Preparar los datos para la serializacion.
+                // Serialize Data and put in manually QR Option
                 var formData = $(this).serializeArray();
                 formData.push({ name: "qr", value: generateQrCode });
 
@@ -26,13 +26,15 @@ $(document).ready(
 
                         // Extraer el valor hash del final de la URL
                         var extractedHash = extractHashFromUrl(response.url);
-
+                        console.log(generateQrCode)
                         console.log(extractedHash);
+                        getQrCode(extractedHash, generateQrCode);
 
                         // Comprobar si la casilla de verificación está seleccionada antes de que se muestre el código QR
+                        /*
                         if (generateQrCode) {
                             getQrCode(extractedHash);
-                        }
+                        }*/
                     },
                     error: function () {
                         $("#result").html(
@@ -67,13 +69,21 @@ $(document).ready(
             });
         });
 
-        // Función de recuperación de código QR
-        function getQrCode(id) {
+        // function to perform GET Request for given [id]. Path: /id/qr
+        function getQrCode(id, generateQrCode) {
+            if (!generateQrCode) {
+                console.log("Checkbox is not checked");
+                return;
+            }
+            console.log("failed weil macht weiter :(")
             $.ajax({
                 type: "GET",
                 url: "/" + id + "/qr",
-                success: function (qrCodeBytes) {
-                    $("#result").append("<div class='alert alert-success lead'>QR Code:<br/><img src='data:image/png;base64," + qrCodeBytes + "' alt='QR Code'/></div>");
+                success: function () {
+                    console.log("AUFGERUFEN!!!")
+                    //$("#result").append("<div class='alert alert-success lead'>QR Code:<br/><img src='data:image/png" + qrCodeBytes + "' alt='QR Code'/></div>");
+                    const qrCodeLink = $("<div class='alert alert-success lead'>QR Code Link: <a href='/" + id + "/qr' target='_blank'>/" + id + "/qr</a></div>");
+                    $("#result").append(qrCodeLink);
                 },
                 error: function () {
                     $("#result").append("<div class='alert alert-danger lead'>Failed to get QR Code</div>");
@@ -81,8 +91,9 @@ $(document).ready(
             });
         }
 
+        //function to extract the hash from a given url
         function extractHashFromUrl(url) {
-            // Número de caracteres a guardar, 8
+            // extracts only the Hash from the URL
             var lengthToKeep = 8;
             return url.slice(-lengthToKeep);
         }

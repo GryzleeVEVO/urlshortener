@@ -12,10 +12,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.net.URI
 
 /**
@@ -37,8 +34,12 @@ interface UrlShortenerController {
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
 
-
-    fun getQrCode(id: String, request: HttpServletRequest): ResponseEntity<String>
+    /**
+     * Generates a QR code for the provided short URL identifier [id].
+     *
+     * Note: Utilizes the [QrUseCase] for QR code creation.
+     */
+    fun getQrCode(id: String, request: HttpServletRequest): ResponseEntity<ByteArray>
 
 }
 
@@ -108,9 +109,8 @@ class UrlShortenerControllerImpl(
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
 
-
-    @GetMapping("/{id:(?!api|index).*}/qr")
-    override fun getQrCode(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<String> {
+    @GetMapping("/{id:(?!api|index).*}/qr", produces = [MediaType.IMAGE_PNG_VALUE])
+    override fun getQrCode(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> {
 
         println("GET QR Code called for id: $id")
         val qrCode = qrCodeUseCase.canGenerateQrCode(id)
@@ -118,6 +118,7 @@ class UrlShortenerControllerImpl(
 
         if (qrCode) {
             val redirectUrl = linkTo<UrlShortenerControllerImpl> { redirectTo(id, request) }.toUri().toString()
+            println(redirectUrl)
             val qrCodeBytes = qrCodeUseCase.createQrCode(redirectUrl)
 
             val headers = HttpHeaders()

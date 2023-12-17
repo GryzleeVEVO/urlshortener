@@ -40,6 +40,9 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var createShortUrlUseCase: CreateShortUrlUseCase
 
+    @MockBean
+    private lateinit var qrUseCase: QrUseCase
+
     //@MockBean
     //private lateinit var qrUseCase: QrUseCase
     //@Test
@@ -66,8 +69,7 @@ class UrlShortenerControllerTest {
         verify(logClickUseCase, never()).logClick("key", ClickProperties(ip = "127.0.0.1"))
     }
 
-    // DEFAULT
-    // @Test prueba
+    //@Test
     fun `creates returns a basic redirect if it can compute a hash`() {
         given(
             createShortUrlUseCase.create(
@@ -75,7 +77,7 @@ class UrlShortenerControllerTest {
                 data = ShortUrlProperties(ip = "127.0.0.1"),
                 customText = "custom"
             )
-        ).willReturn(ShortUrl("f684a3c4prueba", Redirection("http://example.com/")))
+        ).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/")))
 
         mockMvc.perform(
             post("/api/link")
@@ -84,32 +86,11 @@ class UrlShortenerControllerTest {
         )
             .andDo(print())
             .andExpect(status().isCreated)
-            .andExpect(redirectedUrl("http://localhost/f684a3c4prueba"))
-            .andExpect(jsonPath("$.url").value("http://localhost/f684a3c4prueba"))
+            .andExpect(redirectedUrl("http://localhost/f684a3c4"))
+            .andExpect(jsonPath("$.url").value("http://localhost/f684a3c4"))
     }
 
-    // MI VERSION SOLO EJEMPLO EN LA URL
-    // @Test
-    // fun `creates returns a basic redirect if it can compute a hash`() {
-    //     given(
-    //         createShortUrlUseCase.create(
-    //             url = "http://example.com/",
-    //             data = ShortUrlProperties(ip = "127.0.0.1")
-    //         )
-    //     ).willReturn(ShortUrl("ejemplo", Redirection("http://example.com/")))
-
-    //     mockMvc.perform(
-    //         post("/api/link")
-    //             .param("url", "http://example.com/")
-    //             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    //     )
-    //         .andDo(print())
-    //         .andExpect(status().isCreated)
-    //         .andExpect(redirectedUrl("http://localhost/ejemplo"))
-    //         .andExpect(jsonPath("$.url").value("http://localhost/ejemplo"))
-    // }
-
-    // @Test prueba
+    //@Test
     fun `creates returns bad request if it can compute a hash`() {
         given(
             createShortUrlUseCase.create(
@@ -129,7 +110,7 @@ class UrlShortenerControllerTest {
     }
 
     //@Test
-    fun `creates qr code`() {
+    fun `creates qr code when option is checked`() {
        given(
             createShortUrlUseCase.create(
                 url = "http://example.com/",
@@ -151,7 +132,7 @@ class UrlShortenerControllerTest {
     }
 
     //@Test
-    fun `does not create qr code`() {
+    fun `does not create qr code when option not checked`() {
         given(
             createShortUrlUseCase.create(
                 url = "http://example.com/",
@@ -172,5 +153,23 @@ class UrlShortenerControllerTest {
 
 
 
+    }
+    //@Test
+    fun `getQrCode returns NOT_FOUND if key does not exist`() {
+
+        given(qrUseCase.canGenerateQrCode("a1b2c3d4")).willReturn(false)
+
+        mockMvc.perform(get("/{id}/qr", "a1b2c3d4"))
+                .andDo(print())
+                .andExpect(status().isNotFound)
+    }
+
+    //@Test
+    fun `getQrCode returns OK if key does exist`() {
+
+        given(qrUseCase.canGenerateQrCode("a1b2c3d4")).willReturn(true)
+        mockMvc.perform(get("/{id}/qr", "a1b2c3d4"))
+                .andDo(print())
+                .andExpect(status().isOk)
     }
 }

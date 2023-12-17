@@ -11,7 +11,6 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import java.io.ByteArrayOutputStream
-import java.util.Base64
 
 import es.unizar.urlshortener.core.CsvService
 import com.opencsv.CSVReader
@@ -71,13 +70,16 @@ class CsvServiceImpl : CsvService {
     }
 }
 
+/**
+ * Implementation of the port [QrCodeService].
+ */
 class QrCodeServiceImpl : QrCodeService {
 
     companion object {
         const val QR_CODE_WIDTH = 300
         const val QR_CODE_HEIGHT = 300
     }
-    override fun generateQrCode(url: String): String {
+    override fun generateQrCode(url: String): ByteArray {
         val writer = QRCodeWriter()
         val bitMatrix: BitMatrix = writer.encode(url, BarcodeFormat.QR_CODE, QR_CODE_WIDTH, QR_CODE_HEIGHT)
 
@@ -85,11 +87,7 @@ class QrCodeServiceImpl : QrCodeService {
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", stream)
 
         val qrCodeBytes = stream.toByteArray()
-        val base64Image = Base64.getEncoder().encodeToString(qrCodeBytes)
 
-        return base64Image
+        return qrCodeBytes
     }
 }
-
-
-
