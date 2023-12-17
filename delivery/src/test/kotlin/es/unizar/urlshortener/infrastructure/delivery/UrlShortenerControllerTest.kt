@@ -43,9 +43,7 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var qrUseCase: QrUseCase
 
-    //@MockBean
-    //private lateinit var qrUseCase: QrUseCase
-    //@Test
+    @Test
     fun `redirectTo returns a redirect when the key exists`() {
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
 
@@ -56,7 +54,7 @@ class UrlShortenerControllerTest {
         verify(logClickUseCase).logClick("key", ClickProperties(ip = "127.0.0.1"))
     }
 
-    //@Test
+    @Test
     fun `redirectTo returns a not found when the key does not exist`() {
         given(redirectUseCase.redirectTo("key"))
             .willAnswer { throw RedirectionNotFound("key") }
@@ -154,7 +152,7 @@ class UrlShortenerControllerTest {
 
 
     }
-    //@Test
+    @Test
     fun `getQrCode returns NOT_FOUND if key does not exist`() {
 
         given(qrUseCase.canGenerateQrCode("a1b2c3d4")).willReturn(false)
@@ -164,7 +162,7 @@ class UrlShortenerControllerTest {
                 .andExpect(status().isNotFound)
     }
 
-    //@Test
+    @Test
     fun `getQrCode returns OK if key does exist`() {
 
         given(qrUseCase.canGenerateQrCode("a1b2c3d4")).willReturn(true)

@@ -25,7 +25,7 @@ $(document).ready(
                             + "</a></div>");
 
                         // Extraer el valor hash del final de la URL
-                        var extractedHash = extractHashFromUrl(response.url);
+                        var extractedHash = extractHashFromUrl(msg.url);
                         console.log(generateQrCode)
                         console.log(extractedHash);
                         getQrCode(extractedHash, generateQrCode);
@@ -93,8 +93,12 @@ $(document).ready(
 
         //function to extract the hash from a given url
         function extractHashFromUrl(url) {
-            // extracts only the Hash from the URL
-            var lengthToKeep = 8;
-            return url.slice(-lengthToKeep);
+            // partir la URL por '/'
+            var parts = url.split('/');
+
+            // Tomar el último fragmento resultante
+            var lastPart = parts[parts.length - 1];
+
+            return lastPart;
         }
     });

@@ -2,6 +2,7 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.usecases.CsvUseCase
+import es.unizar.urlshortener.core.usecases.QrUseCase
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -37,7 +38,8 @@ interface CsvController {
  */
 @RestController
 class CsvControllerImpl(
-    private val csvUseCase: CsvUseCase
+    private val csvUseCase: CsvUseCase,
+    private val qrCodeUseCase: QrUseCase
 ) : CsvController {
 
     @PostMapping("/api/bulk", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
@@ -117,20 +119,7 @@ class CsvControllerImpl(
         // for (item in cadenaResultado) {
         //     println(item)
         // }
-        
-        //ESTE ES EL BUENO (no quita los hash ya usados), poner la ip a los hash
-       /*val csvContentWithFullUrls = cadenaResultado.lines().map { line ->
-            val splitLine = line.split(",")
-            if (splitLine.size >= 2) {
-                val (originalUrl, processedUrl) = splitLine
-                val fullUrl = linkTo<UrlShortenerControllerImpl> { redirectTo(processedUrl, request) }.toUri()
-                "$originalUrl,$fullUrl"
-            } else {
-                // Handle the case where the line does not contain the expected format
-                "Invalid line format: $line"
-            }
-        }.joinToString("\n")
-        */
+
 
         // ESTE ES EL BUENO (quita los hash que ya se han usado)
         var encontrada = false
@@ -149,6 +138,7 @@ class CsvControllerImpl(
                 }
 
                 var mensajeError = ""
+                var urlQr = ""
                 if (errorProcessing == "ALREADY_EXISTS"){
                     mensajeError = "the custom word [$processedUrl] is already in use"
                 } else if (errorProcessing == "WRONG_FORMAT") {
@@ -158,15 +148,19 @@ class CsvControllerImpl(
                     //coger la primera url acortada para la cabecera Location
                     println("Primera URL acortada: $fullUrl")
                     firstShortenedUrl = "$fullUrl"
+                    urlQr = "$fullUrl/qr"
+                }else{
+                    urlQr = "$fullUrl/qr"
                 }
 
-                "$originalUrl,$fullUrl,$mensajeError"
+
+                "$originalUrl,$fullUrl,$mensajeError,$urlQr"
             } else {
                 // Handle the case where the line does not contain the expected format
                 ""
             }
         }.joinToString("\n")
-        val csvContentWithHeader = "URI,URI_Recortada,Mensaje\n$csvContentWithFullUrls"
+        val csvContentWithHeader = "URI,URI_Recortada,Mensaje,URI_Qr\n$csvContentWithFullUrls"
 
         //(ESTO AHORA ESTA DENTRO DEL CODIGO DE ARRIBA DONDE SE PONE EL TIPO DE ERROR, 
         //  SI NO HAY ERROR ES QUE LA URL ACORTADA ES VALIDA Y SE COGE A PRIMERA) 
