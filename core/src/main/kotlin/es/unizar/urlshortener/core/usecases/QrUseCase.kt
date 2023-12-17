@@ -21,7 +21,7 @@ interface QrUseCase {
      * @param redirectUrl The URL to which the QR code will redirect.
      * @return The generated QR code as a string.
      */
-    fun createQrCode(redirectUrl: String): String
+    fun createQrCode(redirectUrl: String): ByteArray
 }
 
 class QrCodeUseCaseImpl
@@ -38,9 +38,10 @@ class QrCodeUseCaseImpl
         println(shortUrl)
         shortUrl.properties.qr = true
         return true
+
     }
 
-    override fun createQrCode(redirectUrl: String): String {
+    override fun createQrCode(redirectUrl: String): ByteArray {
 
         return qrCodeService.generateQrCode(redirectUrl)
     }

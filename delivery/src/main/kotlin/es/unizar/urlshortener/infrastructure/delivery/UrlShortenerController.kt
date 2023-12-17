@@ -12,10 +12,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.net.URI
 
 /**
@@ -42,7 +39,7 @@ interface UrlShortenerController {
      *
      * Note: Utilizes the [QrUseCase] for QR code creation.
      */
-    fun getQrCode(id: String, request: HttpServletRequest): ResponseEntity<String>
+    fun getQrCode(id: String, request: HttpServletRequest): ResponseEntity<ByteArray>
 
 }
 
@@ -116,7 +113,7 @@ class UrlShortenerControllerImpl(
         }
 
     @GetMapping("/{id:(?!api|index).*}/qr", produces = [MediaType.IMAGE_PNG_VALUE])
-    override fun getQrCode(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<String> {
+    override fun getQrCode(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> {
 
         println("GET QR Code called for id: $id")
         val qrCode = qrCodeUseCase.canGenerateQrCode(id)

@@ -39,5 +39,5 @@ interface HashService {
  * **Note**: It is a design decision to create this port. It could be part of the core .
  */
 interface QrCodeService {
-    fun generateQrCode(url: String): String
+    fun generateQrCode(url: String): ByteArray
 }

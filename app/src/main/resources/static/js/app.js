@@ -56,13 +56,15 @@ $(document).ready(function () {
 
                 // Extracting hash from URL
                 var extractedHash = extractHashFromUrl(response.url);
-
+                console.log(generateQrCode)
                 console.log(extractedHash);
 
-                // Only calls getQrCode if checkbox is checked
+                /*// Only calls getQrCode if checkbox is checked
                 if (generateQrCode) {
+                    console.log("Checkbox is checked"+generateQrCode)
                     getQrCode(extractedHash);
-                }
+                }*/
+                getQrCode(extractedHash, generateQrCode);
             },
             error: function () {
                 $("#result").html("<div class='alert alert-danger lead'>ERROR</div>");
@@ -71,12 +73,20 @@ $(document).ready(function () {
     });
 
     // function to perform GET Request for given [id]. Path: /id/qr
-    function getQrCode(id) {
+    function getQrCode(id, generateQrCode) {
+        if (!generateQrCode) {
+            console.log("Checkbox is not checked");
+            return;
+        }
+        console.log("failed weil macht weiter :(")
         $.ajax({
             type: "GET",
             url: "/" + id + "/qr",
-            success: function (qrCodeBytes) {
-                $("#result").append("<div class='alert alert-success lead'>QR Code:<br/><img src='data:image/png;base64," + qrCodeBytes + "' alt='QR Code'/></div>");
+            success: function () {
+                console.log("AUFGERUFEN!!!")
+                //$("#result").append("<div class='alert alert-success lead'>QR Code:<br/><img src='data:image/png" + qrCodeBytes + "' alt='QR Code'/></div>");
+                const qrCodeLink = $("<div class='alert alert-success lead'>QR Code Link: <a href='/" + id + "/qr' target='_blank'>/" + id + "/qr</a></div>");
+                $("#result").append(qrCodeLink);
             },
             error: function () {
                 $("#result").append("<div class='alert alert-danger lead'>Failed to get QR Code</div>");
