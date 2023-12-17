@@ -34,3 +34,7 @@ interface ValidatorService {
 interface HashService {
     fun hasUrl(url: String): String
 }
+
+interface GeolocationService {
+    fun getCountry(ip: String): String?
+}

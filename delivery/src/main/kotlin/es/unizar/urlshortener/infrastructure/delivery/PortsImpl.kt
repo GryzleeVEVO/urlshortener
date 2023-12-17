@@ -1,9 +1,20 @@
+@file:Suppress("WildcardImport")
 package es.unizar.urlshortener.infrastructure.delivery
 
 import com.google.common.hash.Hashing
+import com.maxmind.geoip2.DatabaseReader
+import com.maxmind.geoip2.DatabaseReader.*
+import com.maxmind.geoip2.exception.AddressNotFoundException
+import com.maxmind.geoip2.exception.GeoIp2Exception
+import es.unizar.urlshortener.core.GeolocationService
 import es.unizar.urlshortener.core.HashService
 import es.unizar.urlshortener.core.ValidatorService
 import org.apache.commons.validator.routines.UrlValidator
+import org.springframework.core.io.ResourceLoader
+import org.springframework.util.ResourceUtils
+import org.springframework.util.ResourceUtils.*
+import java.io.File
+import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 
 /**
@@ -22,4 +33,17 @@ class ValidatorServiceImpl : ValidatorService {
  */
 class HashServiceImpl : HashService {
     override fun hasUrl(url: String) = Hashing.murmur3_32_fixed().hashString(url, StandardCharsets.UTF_8).toString()
+}
+
+class GeolocationServiceImpl(
+    private val databaseReader: DatabaseReader =
+        Builder(getFile("classpath:maxmind/GeoLite2-Country.mmdb")).build()
+) : GeolocationService {
+    override fun getCountry(ip: String): String? {
+        return try {
+            databaseReader.country(InetAddress.getByName(ip)).country.name
+        } catch (e: AddressNotFoundException) {
+            null
+        }
+    }
 }

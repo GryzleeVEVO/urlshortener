@@ -1,11 +1,9 @@
+@file:Suppress("WildcardImport")
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.ShortUrlProperties
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.LogClickUseCase
-import es.unizar.urlshortener.core.usecases.ParseHeaderUseCase
-import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -73,14 +71,16 @@ class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase,
-    val parseHeaderUseCase: ParseHeaderUseCase
+    val parseHeaderUseCase: ParseHeaderUseCase,
+    val getGeolocationUseCase: GetGeolocationUseCase
 ) : UrlShortenerController {
 
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
         redirectUseCase.redirectTo(id).let {
             val ipData = ClickProperties(ip = request.remoteAddr)
-            val data = parseHeaderUseCase.parseHeader(request.getHeader("User-Agent"), ipData)
+            val userAgentData = parseHeaderUseCase.parseHeader(request.getHeader("User-Agent"), ipData)
+            val data  = getGeolocationUseCase.getGeolocation(request.remoteAddr, userAgentData)
 
             logClickUseCase.logClick(id, data)
             val h = HttpHeaders()

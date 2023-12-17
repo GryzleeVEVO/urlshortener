@@ -3,10 +3,7 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.*
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.LogClickUseCase
-import es.unizar.urlshortener.core.usecases.ParseHeaderUseCase
-import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.*
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
@@ -43,39 +40,46 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var parseHeaderUseCase: ParseHeaderUseCase
 
-    @Test
-    fun `redirectTo returns a redirect when the key exists, no User-Agent info`() {
-        given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
-        given(
-            parseHeaderUseCase.parseHeader(
-                null, ClickProperties(ip = "127.0.0.1")
-            )
-        ).willReturn(ClickProperties(ip = "127.0.0.1"))
+    @MockBean
+    private lateinit var geolocationUseCase: GetGeolocationUseCase
 
-        mockMvc.perform(get("/{id}", "key")).andExpect(status().isTemporaryRedirect)
+    @Test
+    fun `redirectTo returns a redirect when the key exists, no User-Agent info and geolocation available`() {
+        given(redirectUseCase.redirectTo("key"))
+            .willReturn(Redirection("http://example.com/"))
+        given(parseHeaderUseCase.parseHeader(null, ClickProperties(ip = "127.0.0.1")))
+            .willReturn(ClickProperties(ip = "127.0.0.1"))
+        given(geolocationUseCase.getGeolocation("127.0.0.1", ClickProperties(ip = "127.0.0.1")))
+            .willReturn(ClickProperties(ip = "127.0.0.1"))
+
+        mockMvc.perform(get("/{id}", "key"))
+            .andExpect(status().isTemporaryRedirect)
             .andExpect(redirectedUrl("http://example.com/"))
 
         verify(logClickUseCase).logClick("key", ClickProperties(ip = "127.0.0.1"))
     }
 
     @Test
-    fun `redirectTo returns a redirect when the key exists, and there is User-Agent info`() {
+    fun `redirectTo returns a redirect when the key exists, and there is User-Agent and geolocation info`() {
         // Mock user-agent obtained from https://deviceatlas.com/blog/list-of-user-agent-strings
         // More User-Agents https://www.whatismybrowser.com/guides/the-latest-user-agent/windows
         val mockUserAgent =
-            "Mozilla/5.0 (Linux; Android 10; SM-A205U) AppleWebKit/537.36 (KHTML, like Gecko) " +
-        "Chrome/95.0.4638.54 Mobile Safari/537.36"
+            "Mozilla/5.0 (Linux; Android 10; SM-A205U) AppleWebKit/537.36 (KHTML, like Gecko) " + "Chrome/95.0.4638.54 Mobile Safari/537.36"
 
-        given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
-        given(parseHeaderUseCase.parseHeader(mockUserAgent, ClickProperties(ip = "127.0.0.1"))).willReturn(
-            ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X")
-        )
+        given(redirectUseCase.redirectTo("key"))
+            .willReturn(Redirection("http://example.com/"))
+        given(parseHeaderUseCase.parseHeader(mockUserAgent, ClickProperties(ip = "127.0.0.1")))
+            .willReturn(ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X"))
+        given(geolocationUseCase.getGeolocation("127.0.0.1", ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X")))
+            .willReturn(ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X", country = "Spain"))
 
-        mockMvc.perform(get("/{id}", "key").header("User-Agent", mockUserAgent)).andExpect(status().isTemporaryRedirect)
+        mockMvc.perform(get("/{id}", "key")
+            //.remoteAddress("155.210.33.10")
+            .header("User-Agent", mockUserAgent)).andExpect(status().isTemporaryRedirect)
             .andExpect(redirectedUrl("http://example.com/"))
 
         verify(logClickUseCase).logClick(
-            "key", ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X")
+            "key", ClickProperties(ip = "127.0.0.1", browser = "Safari", platform = "Mac OS X", country = "Spain")
         )
     }
 
