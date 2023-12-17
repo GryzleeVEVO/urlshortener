@@ -3,10 +3,7 @@ package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.ShortUrlProperties
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.LogClickUseCase
-import es.unizar.urlshortener.core.usecases.QrUseCase
-import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -34,6 +31,10 @@ interface UrlShortenerController {
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
+
+
+
+    fun statistics(id:String, request: HttpServletRequest): ResponseEntity<ClickStatsDataOut>
 
     /**
      * Generates a QR code for the provided short URL identifier [id].
@@ -63,6 +64,13 @@ data class ShortUrlDataOut(
 )
 
 /**
+ * Data returned after getting statistics for logged clicks for a short URL.
+ */
+data class ClickStatsDataOut(
+        val url: URI, val clicks: List<ClickProperties> = emptyList()
+)
+
+/**
  * The implementation of the controller.
  *
  * **Note**: Spring Boot is able to discover this [RestController] without further configuration.
@@ -72,13 +80,19 @@ class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
     val logClickUseCase: LogClickUseCase,
     val createShortUrlUseCase: CreateShortUrlUseCase,
-    val qrCodeUseCase: QrUseCase
+    val qrCodeUseCase: QrUseCase,
+    val parseHeaderUseCase: ParseHeaderUseCase,
+    val getGeolocationUseCase: GetGeolocationUseCase
 ) : UrlShortenerController {
 
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
         redirectUseCase.redirectTo(id).let {
-            logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
+            val ipData = ClickProperties(ip = request.remoteAddr)
+            val userAgentData = parseHeaderUseCase.parseHeader(request.getHeader("User-Agent"), ipData)
+            val data  = getGeolocationUseCase.getGeolocation(request.remoteAddr, userAgentData)
+
+            logClickUseCase.logClick(id, data)
             val h = HttpHeaders()
             h.location = URI.create(it.target)
             ResponseEntity<Unit>(h, HttpStatus.valueOf(it.mode))
@@ -129,5 +143,17 @@ class UrlShortenerControllerImpl(
         }
 
         return ResponseEntity(HttpStatus.NOT_FOUND)
+    }
+
+    @GetMapping("/api/link/{id:(?!api|index).*}")
+    override fun statistics(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClickStatsDataOut> {
+        val url = linkTo<UrlShortenerControllerImpl> { redirectTo(id, request) }.toUri()
+
+        logClickUseCase.getClicksByShortUrlHash(id).let {
+            val response = ClickStatsDataOut(
+                    url = url, clicks = it
+            )
+            return ResponseEntity<ClickStatsDataOut>(response, HttpStatus.OK)
+        }
     }
 }

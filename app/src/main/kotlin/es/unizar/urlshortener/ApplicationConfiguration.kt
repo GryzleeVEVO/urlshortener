@@ -5,12 +5,15 @@ package es.unizar.urlshortener
 import es.unizar.urlshortener.core.usecases.QrCodeUseCaseImpl
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCaseImpl
 import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
+import es.unizar.urlshortener.core.usecases.ParseHeaderUseCaseImpl
 import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
+import es.unizar.urlshortener.core.usecases.GetGeolocationUseCaseImpl
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.QrCodeServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryServiceImpl
+import es.unizar.urlshortener.infrastructure.delivery.GeolocationServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlRepositoryServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,6 +46,9 @@ class ApplicationConfiguration(
     fun hashService() = HashServiceImpl()
 
     @Bean
+    fun geolocationService() = GeolocationServiceImpl()
+
+    @Bean
     fun csvService() = CsvServiceImpl()
 
     @Bean
@@ -52,7 +58,13 @@ class ApplicationConfiguration(
     fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
 
     @Bean
-    fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
+    fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService(), shortUrlRepositoryService())
+
+    @Bean
+    fun parseHeaderUseCase() = ParseHeaderUseCaseImpl()
+
+    @Bean
+    fun getGeolocationUseCase() = GetGeolocationUseCaseImpl(geolocationService())
 
     @Bean
     fun qrCodeUseCas() = QrCodeUseCaseImpl(qrCodeService(), shortUrlRepositoryService())

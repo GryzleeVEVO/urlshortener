@@ -3,6 +3,10 @@ plugins {
     kotlin("plugin.spring")
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation(project(":core"))
     implementation(project(":delivery"))
@@ -10,6 +14,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.webjars:bootstrap:${Version.BOOTSTRAP}")
     implementation("org.webjars:jquery:${Version.JQUERY}")
+
+    implementation("com.maxmind.geoip2:geoip2:4.2.0")
+    implementation("com.maxmind.db:maxmind-db:2.16.0")
 
     runtimeOnly("org.hsqldb:hsqldb")
 

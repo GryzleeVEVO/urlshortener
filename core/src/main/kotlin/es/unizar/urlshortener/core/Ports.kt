@@ -6,6 +6,8 @@ import java.io.File
  * [ClickRepositoryService] is the port to the repository that provides persistence to [Clicks][Click].
  */
 interface ClickRepositoryService {
+    fun findByShortUrlHash(id: String): List<Click>
+
     fun save(cl: Click): Click
 }
 
@@ -52,4 +54,8 @@ interface CsvService {
  */
 interface QrCodeService {
     fun generateQrCode(url: String): ByteArray
+}
+
+interface GeolocationService {
+    fun getCountry(ip: String): String?
 }
