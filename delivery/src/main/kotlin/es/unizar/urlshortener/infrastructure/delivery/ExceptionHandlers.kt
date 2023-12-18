@@ -1,11 +1,6 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
-import es.unizar.urlshortener.core.InvalidUrlException
-import es.unizar.urlshortener.core.RedirectionNotFound
-import es.unizar.urlshortener.core.UsedCustomWordException
-import es.unizar.urlshortener.core.CsvColumnsNotExpected
-import es.unizar.urlshortener.core.CsvNotEnoughRows
-import es.unizar.urlshortener.core.CsvWrongHeaders
+import es.unizar.urlshortener.core.*
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -48,6 +43,10 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun lessCsvLines(ex: CsvNotEnoughRows) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 
+    @ResponseBody
+    @ExceptionHandler(value = [QrCodeNotFound::class])
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun qrCodeNotFound(ex: QrCodeNotFound) = ErrorMessage(HttpStatus.FORBIDDEN.value(), ex.message)
 }
 
 data class ErrorMessage(

@@ -60,7 +60,7 @@ interface UrlShortenerController {
 data class ShortUrlDataIn(
     val url: String,
     val sponsor: String? = null,
-    val customText: String,
+    val customText: String = "",
     val qr: Boolean = false
 )
 
@@ -158,7 +158,8 @@ class UrlShortenerControllerImpl(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "QR code generated"),
-            ApiResponse(responseCode = "404", description = "URL not found")
+            ApiResponse(responseCode = "404", description = "URL not found"),
+            ApiResponse(responseCode = "403", description = "URL does not have QR code")
         ]
     )
     @GetMapping("/{id:(?!api|index).*}/qr", produces = [MediaType.IMAGE_PNG_VALUE])

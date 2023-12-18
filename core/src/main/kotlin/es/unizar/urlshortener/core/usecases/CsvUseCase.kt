@@ -2,15 +2,9 @@
 
 package es.unizar.urlshortener.core.usecases
 
-import es.unizar.urlshortener.core.*
-
-import com.opencsv.CSVReader
-import java.io.File
-import java.io.FileReader
 import com.opencsv.CSVWriter
-import java.io.FileWriter
+import es.unizar.urlshortener.core.*
 import java.io.StringWriter
-
 
 
 /*
@@ -75,6 +69,7 @@ class CsvUseCaseImpl(
                             redirection = Redirection(target = csvContent[i]),
                             properties = ShortUrlProperties(
                                 ip = ipParam,
+                                qr = true
                             )
                         )  
                         shortUrlRepository.save(su)

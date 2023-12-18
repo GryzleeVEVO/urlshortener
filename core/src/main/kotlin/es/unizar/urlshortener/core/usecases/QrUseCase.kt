@@ -1,10 +1,11 @@
 @file:Suppress("WildcardImport")
 package es.unizar.urlshortener.core.usecases
 
-import es.unizar.urlshortener.core.*
-// core/usecases/QrCodeUseCase.kt
+import es.unizar.urlshortener.core.QrCodeNotFound// core/usecases/QrCodeUseCase.kt
 
 import es.unizar.urlshortener.core.QrCodeService
+import es.unizar.urlshortener.core.RedirectionNotFound
+import es.unizar.urlshortener.core.ShortUrlRepositoryService
 
 
 interface QrUseCase {
@@ -36,9 +37,10 @@ class QrCodeUseCaseImpl
 
 
         println(shortUrl)
-        shortUrl.properties.qr = true
-        return true
 
+        if (shortUrl.properties.qr == null || !shortUrl.properties.qr!!) {
+            throw QrCodeNotFound(id)
+        } else return shortUrl.properties.qr!!
     }
 
     override fun createQrCode(redirectUrl: String): ByteArray {
