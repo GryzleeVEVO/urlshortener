@@ -21,7 +21,8 @@ import es.unizar.urlshortener.core.*
 
 
     /**
-     * Given the key of a redirection endpoint, it returns a list of all the clicks that have been made to that endpoint.
+     * Given the key of a redirection endpoint, it returns a list of all the clicks that have been made to that
+     * endpoint.
      *
      * @param hash Hash of the redirection endpoint
      * @return List of clicks for the given hash. If there are no redirections, the list will be empty

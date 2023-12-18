@@ -1,25 +1,25 @@
 @file:Suppress("WildcardImport","LongMethod","CyclomaticComplexMethod")
 package es.unizar.urlshortener.infrastructure.delivery
 
+import es.unizar.urlshortener.core.CsvColumnsNotExpected
+import es.unizar.urlshortener.core.CsvNotEnoughRows
+import es.unizar.urlshortener.core.CsvWrongHeaders
 import es.unizar.urlshortener.core.usecases.CsvUseCase
-import es.unizar.urlshortener.core.usecases.QrUseCase
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
+import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import java.io.File
-import jakarta.servlet.http.HttpServletRequest
-import org.springframework.hateoas.server.mvc.linkTo
-
-import es.unizar.urlshortener.core.ClickProperties
-import org.springframework.web.bind.annotation.PathVariable
 import java.net.URI
-import es.unizar.urlshortener.core.*
 
 interface CsvController {
 
@@ -36,11 +36,19 @@ interface CsvController {
 /**
  * Implementacion del controlador csv
  */
+@Tag(name = "CSV Controller", description = "The bulk shortener controller")
 @RestController
 class CsvControllerImpl(
     private val csvUseCase: CsvUseCase
 ) : CsvController {
 
+    @Operation(summary = "Read a CSV file with links and extra parameters and receive a CSV with shortened links")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "201", description = "URLs shortened successfully"),
+            ApiResponse(responseCode = "400", description = "CSV file could not be processed"),
+        ]
+    )
     @PostMapping("/api/bulk", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     override fun generateCsv(
         @RequestPart("file") csvFile: MultipartFile,

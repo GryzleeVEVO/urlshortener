@@ -4,6 +4,11 @@ package es.unizar.urlshortener.infrastructure.delivery
 import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.usecases.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -51,6 +56,7 @@ interface UrlShortenerController {
 /**
  * Data required to create a short url.
  */
+@Schema(name = "ShortUrlDataIn", description = "Data required to create a short url")
 data class ShortUrlDataIn(
     val url: String,
     val sponsor: String? = null,
@@ -61,6 +67,7 @@ data class ShortUrlDataIn(
 /**
  * Data returned after the creation of a short url.
  */
+@Schema(name = "ShortUrlDataOut", description = "Data returned after the creation of a short url")
 data class ShortUrlDataOut(
     val url: URI? = null,
     val properties: Map<String, Any> = emptyMap()
@@ -69,6 +76,10 @@ data class ShortUrlDataOut(
 /**
  * Data returned after getting statistics for logged clicks for a short URL.
  */
+@Schema(
+    name = "ClickStatsDataOut",
+    description = "Data returned after getting statistics for logged clicks for a short URL"
+)
 data class ClickStatsDataOut(
         val url: URI, val clicks: List<ClickProperties> = emptyList()
 )
@@ -78,6 +89,8 @@ data class ClickStatsDataOut(
  *
  * **Note**: Spring Boot is able to discover this [RestController] without further configuration.
  */
+
+@Tag(name = "Url Shortener", description = "The Url Shortener API")
 @RestController
 class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
@@ -88,6 +101,13 @@ class UrlShortenerControllerImpl(
     val getGeolocationUseCase: GetGeolocationUseCase
 ) : UrlShortenerController {
 
+    @Operation(summary = "Redirects to the original URL")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "307", description = "Redirects to the original URL"),
+            ApiResponse(responseCode = "404", description = "URL not found")
+        ]
+    )
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
         redirectUseCase.redirectTo(id).let {
@@ -101,6 +121,13 @@ class UrlShortenerControllerImpl(
             ResponseEntity<Unit>(h, HttpStatus.valueOf(it.mode))
         }
 
+    @Operation(summary = "Creates a short URL")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "201", description = "Short URL created"),
+            ApiResponse(responseCode = "400", description = "Bad request, invalid URL"),
+        ]
+    )
     @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
@@ -127,6 +154,13 @@ class UrlShortenerControllerImpl(
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
 
+    @Operation(summary = "Generates a QR code for the provided short URL identifier")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "QR code generated"),
+            ApiResponse(responseCode = "404", description = "URL not found")
+        ]
+    )
     @GetMapping("/{id:(?!api|index).*}/qr", produces = [MediaType.IMAGE_PNG_VALUE])
     override fun getQrCode(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> {
 
@@ -148,6 +182,13 @@ class UrlShortenerControllerImpl(
         return ResponseEntity(HttpStatus.NOT_FOUND)
     }
 
+    @Operation(summary = "Returns statistics for logged clicks for a short URL")
+    @ApiResponses(
+            value = [
+                ApiResponse(responseCode = "200", description = "Statistics returned"),
+                ApiResponse(responseCode = "404", description = "URL not found")
+            ]
+    )
     @GetMapping("/api/link/{id:(?!api|index).*}")
     override fun statistics(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClickStatsDataOut> {
         val url = linkTo<UrlShortenerControllerImpl> { redirectTo(id, request) }.toUri()
