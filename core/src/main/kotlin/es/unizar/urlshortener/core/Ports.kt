@@ -1,7 +1,5 @@
 package es.unizar.urlshortener.core
 
-import java.io.File
-
 /**
  * [ClickRepositoryService] is the port to the repository that provides persistence to [Clicks][Click].
  */
@@ -56,6 +54,16 @@ interface QrCodeService {
     fun generateQrCode(url: String): ByteArray
 }
 
+/**
+ * [GeolocationService] is the port to the service that provides geolocation information from an IP.
+ */
 interface GeolocationService {
+
+    /**
+     * Given an IP, it returns the country where it is located. If the IP is not in the database, it returns null.
+     *
+     * @param ip IP to be geolocated.
+     * @return Country where the IP is located. If the IP is not in the database, it returns null.
+     */
     fun getCountry(ip: String): String?
 }

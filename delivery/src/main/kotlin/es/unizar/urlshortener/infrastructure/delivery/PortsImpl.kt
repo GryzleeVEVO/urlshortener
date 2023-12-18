@@ -3,27 +3,19 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
 import com.google.common.hash.Hashing
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.client.j2se.MatrixToImageWriter
+import com.google.zxing.common.BitMatrix
+import com.google.zxing.qrcode.QRCodeWriter
 import com.maxmind.geoip2.DatabaseReader
 import com.maxmind.geoip2.DatabaseReader.Builder
 import com.maxmind.geoip2.exception.AddressNotFoundException
-import es.unizar.urlshortener.core.GeolocationService
-import es.unizar.urlshortener.core.HashService
-import es.unizar.urlshortener.core.QrCodeService
-import es.unizar.urlshortener.core.ValidatorService
+import es.unizar.urlshortener.core.*
 import org.apache.commons.validator.routines.UrlValidator
 import org.springframework.util.ResourceUtils.getFile
+import java.io.ByteArrayOutputStream
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
-import com.google.zxing.common.BitMatrix
-import com.google.zxing.client.j2se.MatrixToImageWriter
-import java.io.ByteArrayOutputStream
-
-import es.unizar.urlshortener.core.CsvService
-import com.opencsv.CSVReader
-import java.io.File
-import java.io.FileReader
 
 /**
  * Implementation of the port [ValidatorService].
@@ -100,6 +92,9 @@ class QrCodeServiceImpl : QrCodeService {
     }
 }
 
+/**
+ * Implementation of the port [GeolocationService].
+ */
 class GeolocationServiceImpl(
     private val databaseReader: DatabaseReader =
         Builder(getFile("classpath:maxmind/GeoLite2-Country.mmdb")).build()
