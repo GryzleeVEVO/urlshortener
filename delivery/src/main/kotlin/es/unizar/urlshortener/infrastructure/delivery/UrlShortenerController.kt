@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -111,15 +114,32 @@ class UrlShortenerControllerImpl(
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
         redirectUseCase.redirectTo(id).let {
-            val ipData = ClickProperties(ip = request.remoteAddr)
-            val userAgentData = parseHeaderUseCase.parseHeader(request.getHeader("User-Agent"), ipData)
-            val data  = getGeolocationUseCase.getGeolocation(request.remoteAddr, userAgentData)
-            logClickUseCase.logClick(id, data)
+            val coroutineId = id
+            val coroutineIp = request.remoteAddr
+            val coroutineUserAgent = request.getHeader("User-Agent")
+
+            CoroutineScope(Dispatchers.IO).launch {
+                logClickAsync(coroutineId, coroutineIp, coroutineUserAgent)
+            }
 
             val h = HttpHeaders()
             h.location = URI.create(it.target)
             ResponseEntity<Unit>(h, HttpStatus.valueOf(it.mode))
         }
+
+    /**
+     * Private auxiliary function for logging a click asynchronously using [CoroutineScope].
+     *
+     * @param id The short url identifier
+     * @param ip IP address of the client
+     * @param userAgent User agent of the client
+     */
+    private fun logClickAsync(id: String, ip: String, userAgent: String) {
+        val ipData = ClickProperties(ip = ip)
+        val userAgentData = parseHeaderUseCase.parseHeader(userAgent, ipData)
+        val data  = getGeolocationUseCase.getGeolocation(ip, userAgentData)
+        logClickUseCase.logClick(id, data)
+    }
 
     @Operation(summary = "Creates a short URL")
     @ApiResponses(

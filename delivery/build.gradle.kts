@@ -20,6 +20,9 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+
+
 
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
