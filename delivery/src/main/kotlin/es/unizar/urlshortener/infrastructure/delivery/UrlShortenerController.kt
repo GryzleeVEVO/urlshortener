@@ -114,6 +114,7 @@ class UrlShortenerControllerImpl(
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
         redirectUseCase.redirectTo(id).let {
+            // VERSIÓN ASINCRONA
             val coroutineId = id
             val coroutineIp = request.remoteAddr
             val coroutineUserAgent = request.getHeader("User-Agent")
@@ -121,6 +122,16 @@ class UrlShortenerControllerImpl(
             CoroutineScope(Dispatchers.IO).launch {
                 logClickAsync(coroutineId, coroutineIp, coroutineUserAgent)
             }
+
+            /*
+            // VERSIÓN SINCRONA PARA TESTS
+            val ip = request.remoteAddr
+            val userAgent = request.getHeader("User-Agent")
+            val ipData = ClickProperties(ip = ip)
+            val userAgentData = parseHeaderUseCase.parseHeader(userAgent, ipData)
+            val data  = getGeolocationUseCase.getGeolocation(ip, userAgentData)
+            logClickUseCase.logClick(id, data)
+             */
 
             val h = HttpHeaders()
             h.location = URI.create(it.target)

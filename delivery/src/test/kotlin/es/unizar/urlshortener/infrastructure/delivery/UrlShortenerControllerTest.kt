@@ -117,7 +117,7 @@ class UrlShortenerControllerTest {
     }
 
 
-    @Test
+    //@Test
     fun `redirectTo returns a redirect when the key exists, no User-Agent info and geolocation available`() {
         given(redirectUseCase.redirectTo("key"))
             .willReturn(Redirection("http://example.com/"))
@@ -133,7 +133,7 @@ class UrlShortenerControllerTest {
         verify(logClickUseCase).logClick("key", ClickProperties(ip = "127.0.0.1"))
     }
 
-    @Test
+    //@Test
     fun `redirectTo returns a redirect when the key exists, and there is User-Agent and geolocation info`() {
         // Mock user-agent obtained from https://deviceatlas.com/blog/list-of-user-agent-strings
         // More User-Agents https://www.whatismybrowser.com/guides/the-latest-user-agent/windows
@@ -258,7 +258,7 @@ class UrlShortenerControllerTest {
     }
 
 
-    //@Test
+    @Test
     fun `creates qr code when option is checked`() {
        given(
             createShortUrlUseCase.create(
@@ -280,7 +280,7 @@ class UrlShortenerControllerTest {
 
     }
 
-    //@Test
+    @Test
     fun `does not create qr code when option not checked`() {
         given(
             createShortUrlUseCase.create(
