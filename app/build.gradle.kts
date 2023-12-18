@@ -18,6 +18,8 @@ dependencies {
     implementation("com.maxmind.geoip2:geoip2:4.2.0")
     implementation("com.maxmind.db:maxmind-db:2.16.0")
 
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
     runtimeOnly("org.hsqldb:hsqldb")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
