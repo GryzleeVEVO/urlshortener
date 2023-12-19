@@ -90,7 +90,7 @@ class UrlShortenerControllerTest {
     }
 
     //Test customWord
-    //@Test
+    @Test
     fun `creates returns a basic redirect if it can compute a custom word`() {
         given(
                 createShortUrlUseCase.create(
@@ -208,7 +208,7 @@ class UrlShortenerControllerTest {
             .andExpect(jsonPath("$.url").value("http://localhost/f684a3c4"))
     }
 
-    //@Test
+    @Test
     fun `creates returns bad request if it can compute a hash`() {
         given(
             createShortUrlUseCase.create(
