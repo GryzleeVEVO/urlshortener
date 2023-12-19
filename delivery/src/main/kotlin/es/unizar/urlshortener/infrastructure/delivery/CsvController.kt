@@ -57,7 +57,7 @@ class CsvControllerImpl(
         
     ): ResponseEntity<String> {
         val ip = request.remoteAddr
-        println("Direccion IP del cliente: $ip")
+        //println("Direccion IP del cliente: $ip")
 
         // Convertir MultipartFile a lista de strings
         val csvContent = readUrlsFromCsv(csvFile).toMutableList()
@@ -70,15 +70,15 @@ class CsvControllerImpl(
 
         //extraer y analizar las cabeceras
         //val validHeaders = setOf("URI", "CUSTOM")
-        println("Cabeceras del CSV:")
+        //println("Cabeceras del CSV:")
         csvContentCopy.take(1).forEach { line ->
             val headers = line.split(",")
-            println(headers)
+            //println(headers)
             if (headers[0] != "URI" && headers[1] != "Custom_Word"){
-                println("Las cabeceras no son correctas")
+                //println("Las cabeceras no son correctas")
                 throw CsvWrongHeaders("URI,Custom_Word")
             }
-            println("Las cabeceras estan bien")
+            //println("Las cabeceras estan bien")
         }
 
 
@@ -86,7 +86,7 @@ class CsvControllerImpl(
         val validColumnCounts = setOf(1, 2)
         val invalidLines = csvContent.filter { it.split(",").size !in validColumnCounts }
         if (invalidLines.isNotEmpty()) {
-            println("ERROR: Hay más o menos columnas de las esperadas")
+            //println("ERROR: Hay más o menos columnas de las esperadas")
             // throw InvalidUrlException("fdfsj")
             //ResponseEntity("CSV con más columnas de las permitidas", HttpStatus.BAD_REQUEST)
             throw CsvColumnsNotExpected("2")
@@ -100,13 +100,13 @@ class CsvControllerImpl(
         }
         csvContent.removeAt(csvContent.size - 1)
 
-        println("Primera componente del csv: ${csvContent[0]}")
+        //println("Primera componente del csv: ${csvContent[0]}")
 
         //separar urls de customWord (si contiene palabras personalizadas)
         val csvUrls = csvContent.map { it.split(",")[0] }
         val csvWords = csvContent.map { if (it.contains(",")) it.split(",")[1] else "" }
-        println("URLs: $csvUrls")
-        println("Palabras: $csvWords")
+        //println("URLs: $csvUrls")
+        //println("Palabras: $csvWords")
 
         // Llamar al caso de uso para generar el CSV
         val csvContentResult = csvUseCase.createCsv(csvUrls, csvWords, ip) //customText
@@ -136,11 +136,11 @@ class CsvControllerImpl(
             if (splitLine.size >= 2) {
                 val (originalUrl, processedUrl, errorProcessing) = splitLine
 
-                println("comprobando url: $originalUrl, $processedUrl")
+                //println("comprobando url: $originalUrl, $processedUrl")
                 val fullUrl = if (errorProcessing == "ALREADY_EXISTS" || errorProcessing == "WRONG_FORMAT" ) {
                     ""
                 } else {
-                    println("genrando url: $originalUrl, $processedUrl")
+                    //println("genrando url: $originalUrl, $processedUrl")
                     linkTo<UrlShortenerControllerImpl> { redirectTo(processedUrl, request) }.toUri()
                 }
 
@@ -153,7 +153,7 @@ class CsvControllerImpl(
                 }else if (!encontrada){ //si no tiene error esa linea
                     encontrada = true
                     //coger la primera url acortada para la cabecera Location
-                    println("Primera URL acortada: $fullUrl")
+                    //println("Primera URL acortada: $fullUrl")
                     firstShortenedUrl = "$fullUrl"
                     urlQr = "$fullUrl/qr"
                 }else{

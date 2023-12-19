@@ -47,23 +47,23 @@ class CsvUseCaseImpl(
         val errorProcessing = mutableListOf<String>()
         // Guardar en la BD
         for (i in csvContent.indices) {
-            println("Redireccion a: ${csvContent[i]}")
-            println("Hash: ${processedUrls[i]}")
-            println("Direccion IP del cliente: $ipParam")
+            //println("Redireccion a: ${csvContent[i]}")
+            //println("Hash: ${processedUrls[i]}")
+            //println("Direccion IP del cliente: $ipParam")
 
             
                 shortUrlRepository.findByKey(processedUrls[i])?.let{
                     if (customWords[i] != ""){
-                        println("YA ESTA EN LA BDDDDDDDDDDD")
+                        //println("YA ESTA EN LA BDDDDDDDDDDD")
                         //sustituir la url recortada por vacio
                         errorProcessing.add("ALREADY_EXISTS")
                     } else{
-                        println("CustomWord: no tiene custom word")
+                        //println("CustomWord: no tiene custom word")
                         errorProcessing.add("")
                     }
                 }?: run {
                     if (validatorService.isValid(csvContent[i])) {
-                        println("NO ESTA EN LA BDDDDDDDDDDD")
+                        //println("NO ESTA EN LA BDDDDDDDDDDD")
                         val su = ShortUrl(
                             hash = processedUrls[i],
                             redirection = Redirection(target = csvContent[i]),
@@ -75,7 +75,7 @@ class CsvUseCaseImpl(
                         shortUrlRepository.save(su)
                         errorProcessing.add("")
                     } else {
-                        println("No guardado en la BD porque no cumple el formato de url")
+                        //println("No guardado en la BD porque no cumple el formato de url")
                         errorProcessing.add("WRONG_FORMAT")
                     }
                 }
@@ -83,7 +83,7 @@ class CsvUseCaseImpl(
             
         }
 
-        println("errorProcessing: $errorProcessing")
+        //println("errorProcessing: $errorProcessing")
 
         // se ponen de por si comillas en el hash
         val stringWriter = StringWriter()

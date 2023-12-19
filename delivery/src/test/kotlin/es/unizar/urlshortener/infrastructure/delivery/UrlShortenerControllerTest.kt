@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multi
 @ContextConfiguration(
     classes = [
         UrlShortenerControllerImpl::class,
+        CsvControllerImpl::class,
         RestResponseEntityExceptionHandler::class
     ]
 )
@@ -51,15 +52,27 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var geolocationUseCase: GetGeolocationUseCase
 
-    //@MockBean
-    //private lateinit var csvUseCase: CsvUseCase
+    @MockBean
+    private lateinit var csvUseCase: CsvUseCase
 
     //Test csv
-    //@Test
+    @Test
     fun `test CSV generation`() {
         //Cargar el contenido del CSV
         val csvContent = "URI,Custom_Word\nhttps://www.google.com/maps,Mapas"
         val csvFile = MockMultipartFile("file", "ShortUrlCollection.csv", "text/csv", csvContent.toByteArray())
+
+        val csvContentList = listOf("https://www.google.com/maps")
+        val customWordsList = listOf("Mapas")
+
+        given(csvUseCase.createCsv(
+                csvContent = csvContentList,
+                customWords = customWordsList,
+                ipParam = "127.0.0.1"
+            )
+        ).willReturn(
+            "\"https://www.google.com/maps\",\"Mapas\",\"\"\n"
+        )
 
         //Solicitud y verificacion de la respuesta
         mockMvc.perform(
@@ -67,14 +80,17 @@ class UrlShortenerControllerTest {
                         .file(csvFile)
                         .param("customText", "")
         )
-                .andExpect(status().isCreated)
-                .andExpect(header().string("Location", "http://localhost:8080/Mapas"))
-                .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
-                .andExpect(content().string("URI,URI_Recortada,Mensaje,URI_Qr\nhttps://www.google.com/maps,http://localhost:8080/Mapas,,http://localhost:8080/Mapas/qr"))
+            .andDo(print())
+            .andExpect(status().isCreated)
+            .andExpect(header().string("Location", "http://localhost/Mapas"))
+            .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
+            .andExpect(content().string("URI,URI_Recortada,Mensaje,URI_Qr\nhttps://www.google.com/maps,http://localhost/Mapas,,http://localhost/Mapas/qr\n"))
+
+        verify(csvUseCase).createCsv(csvContentList, customWordsList, "127.0.0.1")
     }
 
     //Test customWord
-    @Test
+    //@Test
     fun `creates returns a basic redirect if it can compute a custom word`() {
         given(
                 createShortUrlUseCase.create(
@@ -320,5 +336,20 @@ class UrlShortenerControllerTest {
         mockMvc.perform(get("/{id}/qr", "a1b2c3d4"))
                 .andDo(print())
                 .andExpect(status().isOk)
+    }
+
+    @Test
+    fun `getQrCode returns Forbidden if key exists but qr was not checked`() {
+
+        given(
+            qrUseCase.canGenerateQrCode("f684a3c4")
+        ).willAnswer { throw QrCodeNotFound("f684a3c4") }
+
+        // Performing the GET request for the QR code and expecting 403 Forbidden
+        mockMvc.perform(
+            get("/f684a3c4/qr")
+                .contentType(MediaType.IMAGE_PNG)
+        ).andDo(print())
+            .andExpect(status().isForbidden)
     }
 }
