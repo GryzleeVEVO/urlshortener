@@ -32,7 +32,7 @@ interface UrlShortenerController {
     /**
      * Redirects and logs a short url identified by its [id].
      *
-     * **Note**: Delivery of use cases [RedirectUseCase] and [LogClickUseCase].
+     * **Note**: Delivery of use cases [RedirectUseCase] and [LogClickUseCase.logClick].
      */
     fun redirectTo(id: String, request: HttpServletRequest): ResponseEntity<Unit>
 
@@ -45,6 +45,11 @@ interface UrlShortenerController {
 
 
 
+    /**
+     * Returns statistics for logged clicks for a short URL.
+     *
+     * **Note**: Delivery of use case [LogClickUseCase.getClicksByShortUrlHash].
+     */
     fun statistics(id:String, request: HttpServletRequest): ResponseEntity<ClickStatsDataOut>
 
     /**
@@ -145,7 +150,7 @@ class UrlShortenerControllerImpl(
      * @param ip IP address of the client
      * @param userAgent User agent of the client
      */
-    private fun logClickAsync(id: String, ip: String, userAgent: String) {
+    private suspend fun logClickAsync(id: String, ip: String, userAgent: String) {
         val ipData = ClickProperties(ip = ip)
         val userAgentData = parseHeaderUseCase.parseHeader(userAgent, ipData)
         val data  = getGeolocationUseCase.getGeolocation(ip, userAgentData)
