@@ -48,14 +48,14 @@ class HttpRequestTest {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "shorturl", "click")
     }
 
-    // @Test
+    @Test
     fun `main page works`() {
         val response = restTemplate.getForEntity("http://localhost:$port/", String::class.java)
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body).contains("A front-end example page for the project")
     }
 
-    // @Test
+    @Test
     fun `redirectTo returns a redirect when the key exists`() {
         val target = shortUrl("http://example.com/").headers.location
         require(target != null)
@@ -66,7 +66,7 @@ class HttpRequestTest {
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(1)
     }
 
-    // @Test prueba
+    @Test
     fun `redirectTo returns a not found when the key does not exist`() {
         val response = restTemplate.getForEntity("http://localhost:$port/f684a3c4prueba", String::class.java)
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -75,7 +75,7 @@ class HttpRequestTest {
     }
 
     // DEFAULT
-    // @Test prueba
+    @Test
     fun `creates returns a basic redirect if it can compute a hash`() {
         val response = shortUrl("http://example.com/")
 
@@ -100,7 +100,7 @@ class HttpRequestTest {
     //     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
     // }
 
-    // @Test
+    @Test
     fun `creates returns bad request if it can't compute a hash`() {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
