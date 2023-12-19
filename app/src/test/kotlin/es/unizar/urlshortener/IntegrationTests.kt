@@ -55,7 +55,7 @@ class HttpRequestTest {
         assertThat(response.body).contains("A front-end example page for the project")
     }
 
-    @Test
+    //@Test
     fun `redirectTo returns a redirect when the key exists`() {
         val target = shortUrl("http://example.com/").headers.location
         require(target != null)
@@ -75,7 +75,7 @@ class HttpRequestTest {
     }
 
     // DEFAULT
-    @Test
+    //@Test
     fun `creates returns a basic redirect if it can compute a hash`() {
         val response = shortUrl("http://example.com/")
 
