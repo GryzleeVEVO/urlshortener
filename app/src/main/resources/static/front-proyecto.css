@@ -1,0 +1,129 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+.container-full {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 100% of the viewport height */
+    background: linear-gradient(to right, #4EF9E4, #D565F1);
+}
+
+h1 {
+    color: #fff
+}
+
+.row {
+    margin: 10px; /* Añadir margen para separar las filas */
+}
+
+.col-lg-12 {
+    text-align: center;
+    /* color: #ffffff; */
+}
+
+.input-group {
+    margin-bottom: 15px;
+    border-radius: 2px;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: transparent;
+}
+
+/* Aumentar el tamaño de los campos de entrada */
+.input-group input[name="url"] {
+    font-size: 18px;
+    padding: 10px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border: 2px solid #ffffff;
+}
+
+.input-group input[name="customText"] {
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 2px;
+    border: 2px solid #ffffff;
+}
+
+
+.input-group-addon{
+    font-size: 18px;
+    color: #000000;
+    background-color: #ffffff;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+/* Aumentar el tamaño de los botones */
+.btn-lg {
+    font-size: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-top: 8px;
+    padding-bottom: 10px;
+    border: 2px solid #ffffff;
+    background: #ffffff;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Añadir estilos para el resultado */
+#result {
+    padding: 10px;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    background-color: #ffffff;
+    background: #ffffff;
+}
+
+.input-group label {
+    font-size: 18px; /* Ajusta según tus preferencias */
+    background-color: #fff; /* Cambia este color según tus preferencias */
+    padding-bottom: 14px;
+    padding-top: 13px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 2px solid #ffffff;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.input-group input[type="file"] {
+    font-size: 16px; /* Ajusta según tus preferencias */
+    padding: 10px;
+    background-color: #fff; /* Cambia este color según tus preferencias */
+    border: 0px solid #ffffff;
+    margin-top: 30px;
+}
+
+.input-group input[type="file"]::-webkit-file-upload-button {
+    background: linear-gradient(to right, #40cebd, #D565F1);;
+    color: #000000;
+    padding: 5px;
+    border: transparent;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 18px;
+}
+
+#csvForm button {
+    font-size: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 12px;
+    padding-bottom: 14px;
+    background-color: #ffffff; /* Cambia este color según tus preferencias */
+    color: #000; /* Cambia este color según tus preferencias */
+    border: 1px solid #ffffff; /* Puedes ajustar el color del borde si lo deseas */
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
