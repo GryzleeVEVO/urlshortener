@@ -5,12 +5,12 @@ $(document).ready(
                 event.preventDefault();
 
                 // Prove whether QR option is checked
-                var generateQrCode = $("#qr").prop("checked");
-                console.log(generateQrCode);
+                var qrCodeRequested = $("#qr").prop("checked");
+                //console.log(qrCodeRequested);
 
                 // Serialize Data and put in manually QR Option
                 var formData = $(this).serializeArray();
-                formData.push({ name: "qr", value: generateQrCode });
+                formData.push({ name: "qr", value: qrCodeRequested });
 
                 $.ajax({
                     type: "POST",
@@ -26,13 +26,13 @@ $(document).ready(
 
                         // Extraer el valor hash del final de la URL
                         var extractedHash = extractHashFromUrl(msg.url);
-                        console.log(generateQrCode)
-                        console.log(extractedHash);
-                        getQrCode(extractedHash, generateQrCode);
+                        //console.log(qrCodeRequested)
+                        //console.log(extractedHash);
+                        getQrCode(extractedHash, qrCodeRequested);
 
                         // Comprobar si la casilla de verificación está seleccionada antes de que se muestre el código QR
                         /*
-                        if (generateQrCode) {
+                        if (qrCodeRequested) {
                             getQrCode(extractedHash);
                         }*/
                     },
@@ -72,16 +72,14 @@ $(document).ready(
         // function to perform GET Request for given [id]. Path: /id/qr
         function getQrCode(id, generateQrCode) {
             if (!generateQrCode) {
-                console.log("Checkbox is not checked");
+                //console.log("Checkbox is not checked");
                 return;
             }
-            console.log("failed weil macht weiter :(")
+
             $.ajax({
                 type: "GET",
                 url: "/" + id + "/qr",
                 success: function () {
-                    console.log("AUFGERUFEN!!!")
-                    //$("#result").append("<div class='alert alert-success lead'>QR Code:<br/><img src='data:image/png" + qrCodeBytes + "' alt='QR Code'/></div>");
                     const qrCodeLink = $("<div class='alert alert-success lead'>QR Code Link: <a href='/" + id + "/qr' target='_blank'>/" + id + "/qr</a></div>");
                     $("#result").append(qrCodeLink);
                 },

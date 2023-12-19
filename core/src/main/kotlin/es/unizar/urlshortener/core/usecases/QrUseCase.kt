@@ -20,7 +20,7 @@ interface QrUseCase {
      * Creates a QR code for the provided redirection URL.
      *
      * @param redirectUrl The URL to which the QR code will redirect.
-     * @return The generated QR code as a string.
+     * @return The generated QR code as a ByteArray.
      */
     fun createQrCode(redirectUrl: String): ByteArray
 }
@@ -36,7 +36,7 @@ class QrCodeUseCaseImpl
             ?: throw RedirectionNotFound("Short URL with ID $id not found") // 404 Not Found
 
 
-        println(shortUrl)
+        //println(shortUrl)
 
         if (shortUrl.properties.qr == null || !shortUrl.properties.qr!!) {
             throw QrCodeNotFound(id)
